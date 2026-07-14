@@ -11,7 +11,7 @@
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; box-sizing: border-box; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
         button { background: #2b6cb0; color: white; border: none; font-weight: bold; cursor: pointer; }
         button:hover { background: #1a4975; }
-        #reader { width: 100%; background: #000; border-radius: 6px; overflow: hidden; margin-top: 10px; }
+        #reader { width: 100%; background: #000; border-radius: 6px; overflow: hidden; margin-top: 10px; min-height: 250px; }
         #status { font-weight: bold; margin-top: 15px; padding: 10px; border-radius: 6px; display: none; }
         .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
@@ -26,14 +26,15 @@
         <div id="login-section">
             <input type="email" id="email-guru" placeholder="Masukkan Email Guru Anda" required>
             <input type="text" id="mapel" placeholder="Mata Pelajaran saat ini (Contoh: Matematika)" required>
-            <button onclick="startScanner()">Masuk & Mulai Scan</button>
+            <button onclick="masukSesi()">Masuk Sesi Guru</button>
         </div>
         
         <div id="scan-section" style="display:none;">
-            <p style="background: #edf2f7; padding: 8px; border-radius: 4px; font-size: 13px;">
+            <p style="background: #edf2f7; padding: 8px; border-radius: 4px; font-size: 13px; text-align: left;">
                 <strong>Guru:</strong> <span id="display-guru"></span><br>
                 <strong>Mapel:</strong> <span id="display-mapel"></span>
             </p>
+            <button id="start-cam-btn" onclick="startScanner()" style="background: #319795;">1. Klik untuk Aktifkan Kamera</button>
             <div id="reader"></div>
             <div id="status"></div>
             <button onclick="lokasiKeluar()" style="background:#e53e3e; margin-top:15px;">Keluar Sesi / Ganti Guru</button>
@@ -42,10 +43,10 @@
 
     <script>
         // GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby5TYVlbTQOoE3hIYrkM5xRpLbW7DatqvKYUrk9mCIBovc_UYg1y1QxiV-PZHt6lmk/exec"; 
-        let html5QrcodeScanner;
+        const WEB_APP_URL = ""; https://script.google.com/macros/s/AKfycby5TYVlbTQOoE3hIYrkM5xRpLbW7DatqvKYUrk9mCIBovc_UYg1y1QxiV-PZHt6lmk/exec
+        let html5QrCode;
 
-        function startScanner() {
+        function masukSesi() {
             const email = document.getElementById("email-guru").value.trim();
             const mapel = document.getElementById("mapel").value.trim();
             if(!email || !mapel) return alert("Mohon lengkapi email guru dan mata pelajaran!");
@@ -54,35 +55,52 @@
             document.getElementById("scan-section").style.display = "block";
             document.getElementById("display-guru").innerText = email;
             document.getElementById("display-mapel").innerText = mapel;
+        }
 
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 250 });
-            html5QrcodeScanner.render(onScanSuccess);
+        function startScanner() {
+            document.getElementById("start-cam-btn").style.display = "none";
+            html5QrCode = new Html5Qrcode("reader");
+            
+            // Memaksa browser meminta izin kamera belakang secara resmi
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: 250 },
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                alert("Gagal akses kamera: " + err);
+                document.getElementById("start-cam-btn").style.display = "block";
+            });
         }
 
         function onScanSuccess(decodedText) {
-            html5QrcodeScanner.clear();
-            showStatus("Memproses data QR...", "success");
+            // Hentikan kamera sementara saat memproses data agar tidak memindai berulang kali
+            html5QrCode.stop().then(() => {
+                showStatus("Memproses data QR...", "success");
 
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                mode: "no-cors", // Mengizinkan request lintas domain tanpa hambatan CORS
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    emailGuru: document.getElementById("email-guru").value,
-                    mapel: document.getElementById("mapel").value,
-                    qrData: decodedText
-                })
-            }).then(() => {
-                showStatus("Permintaan dikirim! Sistem sedang memvalidasi & mengirim WhatsApp...", "success");
-                setTimeout(() => { 
-                    html5QrcodeScanner.render(onScanSuccess); 
-                }, 3000);
-            }).catch(err => {
-                showStatus("Koneksi gagal atau terjadi masalah jaringan.", "error");
-                setTimeout(() => { 
-                    html5QrcodeScanner.render(onScanSuccess); 
-                }, 3000);
+                fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors", 
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        emailGuru: document.getElementById("email-guru").value,
+                        mapel: document.getElementById("mapel").value,
+                        qrData: decodedText
+                    })
+                }).then(() => {
+                    showStatus("Permintaan terkirim! Sistem sedang memvalidasi database...", "success");
+                    setTimeout(() => { 
+                        startScanner(); // Nyalakan kamera lagi setelah 3 detik untuk siswa berikutnya
+                    }, 3000);
+                }).catch(err => {
+                    showStatus("Koneksi gagal atau terjadi masalah jaringan.", "error");
+                    setTimeout(() => { startScanner(); }, 3000);
+                });
             });
+        }
+
+        function onScanFailure(error) {
+            // Diabaikan agar log scanner tidak memenuhi layar browser
         }
 
         function showStatus(msg, type) {
@@ -93,12 +111,8 @@
         }
 
         function lokasiKeluar() {
-            if(html5QrcodeScanner) {
-                html5QrcodeScanner.clear().then(() => {
-                    window.location.reload();
-                }).catch(() => {
-                    window.location.reload();
-                });
+            if(html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => { window.location.reload(); }).catch(() => { window.location.reload(); });
             } else {
                 window.location.reload();
             }
