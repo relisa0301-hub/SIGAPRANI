@@ -1,13 +1,31 @@
 async function postAPI(data){
 
-    const response = await fetch(CONFIG.API_URL,{
+const response=await fetch(CONFIG.API_URL,{
 
-        method:"POST",
+method:"POST",
 
-        body:JSON.stringify(data)
+headers:{
 
-    });
+"Content-Type":"application/json"
 
-    return await response.json();
+},
+
+body:JSON.stringify(data)
+
+});
+
+return await response.json();
+
+}
+
+async function getAPI(action){
+
+const response=await fetch(
+
+CONFIG.API_URL+"?action="+action
+
+);
+
+return await response.json();
 
 }
