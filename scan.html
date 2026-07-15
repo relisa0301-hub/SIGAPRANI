@@ -1,20 +1,23 @@
 <!DOCTYPE html>
+
 <html lang="id">
 
 <head>
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Scan QR - SIGAP RANI</title>
+<title>SCAN QR</title>
 
 <link rel="stylesheet" href="css/style.css">
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script src="js/config.js"></script>
+
 <script src="js/api.js"></script>
+
 <script src="js/scanner.js"></script>
 
 </head>
@@ -35,29 +38,21 @@ Kembali
 
 <div class="container">
 
-<h2 style="margin-top:20px">
+<div class="card" style="padding:20px;margin-top:20px;">
 
-SCAN QR SISWA
+<h2>SCAN ABSENSI</h2>
 
-</h2>
+<br>
 
-<select id="kelas">
+<select id="kelas"></select>
 
-<option value="">Pilih Kelas</option>
-
-</select>
-
-<br><br>
 <br><br>
 
 <select id="jam"></select>
 
 <br><br>
-<select id="mapel">
 
-<option value="">Pilih Mata Pelajaran</option>
-
-</select>
+<select id="mapel"></select>
 
 <br><br>
 
@@ -66,6 +61,8 @@ SCAN QR SISWA
 <br>
 
 <div id="hasil"></div>
+
+</div>
 
 </div>
 
