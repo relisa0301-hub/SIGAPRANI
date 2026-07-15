@@ -22,21 +22,21 @@ action:"kelas"
 
 });
 
-let html="<option value=''>Pilih Kelas</option>";
+let isi="<option value=''>Pilih Kelas</option>";
 
 kelas.data.forEach(function(k){
 
-html+="<option value='"+k.kode+"'>"+k.nama+"</option>";
+isi+="<option value='"+k.nama+"'>"+k.nama+"</option>";
 
 });
 
-document.getElementById("kelas").innerHTML=html;
+document.getElementById("kelas").innerHTML=isi;
 
 let jam="";
 
 for(let i=1;i<=10;i++){
 
-jam+="<option value='"+i+"'>Jam "+i+"</option>";
+jam+="<option value='"+i+"'>Jam Pelajaran "+i+"</option>";
 
 }
 
@@ -46,7 +46,11 @@ scanner=new Html5Qrcode("reader");
 
 scanner.start(
 
-{facingMode:"environment"},
+{
+
+facingMode:"environment"
+
+},
 
 {
 
@@ -66,30 +70,32 @@ async function scanBerhasil(qr){
 
 scanner.pause();
 
+document.getElementById("hasil").innerHTML="Memproses...";
+
 const user=JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
 
 const hasil=await postAPI({
 
 action:"scan",
 
-guru:user.nama,
-
-mapel:user.mapel,
+qr:qr,
 
 kelas:document.getElementById("kelas").value,
 
 jam:document.getElementById("jam").value,
 
-qr:qr
+guru:user.nama,
+
+mapel:user.mapel
 
 });
 
 document.getElementById("hasil").innerHTML=hasil.message;
 
-setTimeout(()=>{
+setTimeout(function(){
 
 scanner.resume();
 
-},2500);
+},3000);
 
 }
