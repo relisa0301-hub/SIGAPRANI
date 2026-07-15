@@ -1,1 +1,135 @@
+/* =====================================
+   SIGAP RANI v4
+   Style Utama
+===================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+}
+
+:root{
+
+    --maroon:#800000;
+    --maroon-dark:#5c0000;
+    --gold:#f5c542;
+
+    --white:#ffffff;
+    --black:#222222;
+
+    --gray:#eeeeee;
+
+    --shadow:0 10px 30px rgba(0,0,0,.18);
+
+    --radius:18px;
+
+}
+
+body{
+
+    background:#f3f5f7;
+
+    color:var(--black);
+
+    min-height:100vh;
+
+}
+
+a{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+button{
+
+    cursor:pointer;
+
+    border:none;
+
+    outline:none;
+
+}
+
+input{
+
+    outline:none;
+
+}
+
+img{
+
+    max-width:100%;
+
+}
+
+.container{
+
+    width:95%;
+
+    max-width:1200px;
+
+    margin:auto;
+
+}
+
+.card{
+
+    background:white;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+}
+
+.hidden{
+
+    display:none;
+
+}
+
+.center{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.text-center{
+
+    text-align:center;
+
+}
+
+.mt10{
+
+    margin-top:10px;
+
+}
+
+.mt20{
+
+    margin-top:20px;
+
+}
+
+.mt30{
+
+    margin-top:30px;
+
+}
+
+.mb20{
+
+    margin-bottom:20px;
+
+}
 
