@@ -206,3 +206,46 @@ background:#5c0000;
 transform:scale(1.03);
 
 }
+#reader{
+
+width:100%;
+
+max-width:500px;
+
+margin:auto;
+
+border-radius:15px;
+
+overflow:hidden;
+
+box-shadow:0 10px 20px rgba(0,0,0,.2);
+
+}
+
+select{
+
+width:100%;
+
+padding:15px;
+
+border-radius:10px;
+
+border:2px solid #ddd;
+
+font-size:16px;
+
+}
+
+#hasil{
+
+margin-top:20px;
+
+font-size:22px;
+
+font-weight:bold;
+
+text-align:center;
+
+color:#800000;
+
+}
