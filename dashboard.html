@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Guru - SIGAP RANI</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<script src="js/config.js"></script>
+
+<script src="js/dashboard.js"></script>
+
+</head>
+
+<body onload="cekLogin()">
+
+<header class="topbar">
+
+<h2>SIGAP RANI</h2>
+
+<button onclick="logout()">Logout</button>
+
+</header>
+
+<div class="container">
+
+<h1 id="namaGuru"></h1>
+
+<p id="mapelGuru"></p>
+
+<div class="menu">
+
+<button onclick="window.location='scan.html'">
+
+📷 Scan QR
+
+</button>
+
+<button onclick="window.location='laporan.html'">
+
+📊 Rekap
+
+</button>
+
+<button onclick="window.location='profile.html'">
+
+👤 Profil
+
+</button>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
