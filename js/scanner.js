@@ -182,13 +182,16 @@ const tbody=document.querySelector("#riwayat tbody");
 
 const row=tbody.insertRow(0);
 
-row.insertCell(0).innerHTML=data.jam;
-row.insertCell(1).innerHTML=data.nama;
-row.insertCell(2).innerHTML=data.kelas;
+row.innerHTML=
+"<td>"+data.jam+"</td>"+
+"<td>"+data.nama+"</td>"+
+"<td>"+data.kelas+"</td>";
 
-if(tbody.rows.length>10){
+while(tbody.rows.length>10){
 
 tbody.deleteRow(10);
+
+}
 
 }
 
