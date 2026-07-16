@@ -1,5 +1,6 @@
 let scanner;
-
+let jumlahHadir = 0;
+let jumlahSiswa = 0;
 async function mulaiScanner(){
 
     const user = JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
@@ -13,7 +14,7 @@ async function mulaiScanner(){
         "<option value='"+user.mapel+"'>"+user.mapel+"</option>";
 
     const kelas = await getAPI("kelas");
-
+updateCounter();
     let isi = "";
 
     kelas.data.forEach(function(k){
@@ -123,6 +124,9 @@ async function scanBerhasil(qr){
 "<b>Guru :</b> "+hasil.guru+"<br>"+
 "<b>Jam :</b> "+hasil.jam;
 tambahRiwayat(hasil);
+        jumlahHadir++;
+
+updateCounter();
         if(navigator.vibrate){
             navigator.vibrate(200);
         }
@@ -172,5 +176,12 @@ if(tbody.rows.length>10){
 tbody.deleteRow(10);
 
 }
+
+}
+function updateCounter(){
+
+document.getElementById("counter").innerHTML=
+
+"Hadir : "+jumlahHadir+" / "+jumlahSiswa;
 
 }
