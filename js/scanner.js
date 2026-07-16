@@ -16,11 +16,7 @@ document.getElementById("mapel").innerHTML=
 
 "<option value='"+user.mapel+"'>"+user.mapel+"</option>";
 
-const kelas=await postAPI({
-
-action:"kelas"
-
-});
+const kelas = await getAPI("kelas");
 alert("API KELAS DIPANGGIL");
 alert(JSON.stringify(kelas));
 alert(JSON.stringify(kelas));
