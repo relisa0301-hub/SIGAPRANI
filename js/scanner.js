@@ -21,7 +21,8 @@ const kelas=await postAPI({
 action:"kelas"
 
 });
-
+alert("API KELAS DIPANGGIL");
+alert(JSON.stringify(kelas));
 alert(JSON.stringify(kelas));
 let isi="<option value=''>Pilih Kelas</option>";
 
