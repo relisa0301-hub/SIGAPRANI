@@ -1,5 +1,4 @@
 let scanner;
-alert("SCANNER VERSI 17 JULI");
 
 let scanner;
 let jumlahHadir = 0;
