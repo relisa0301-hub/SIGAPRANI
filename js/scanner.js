@@ -30,34 +30,50 @@ async function mulaiScanner(){
 
     document.getElementById("jam").innerHTML = jam;
 
+    document.getElementById("hasil").innerHTML="Membuka kamera...";
+
     scanner = new Html5Qrcode("reader");
 
     try{
 
-        const devices = await Html5Qrcode.getCameras();
+        await scanner.start(
+            {
+                facingMode:{
+                    exact:"environment"
+                }
+            },
+            {
+                fps:10,
+                qrbox:250
+            },
+            scanBerhasil
+        );
 
-        if(devices && devices.length){
+        document.getElementById("hasil").innerHTML="";
 
-            const cameraId = devices[devices.length-1].id;
+    }catch(e){
+
+        try{
 
             await scanner.start(
-                cameraId,
+                {
+                    facingMode:"environment"
+                },
                 {
                     fps:10,
-                    qrbox:{width:250,height:250}
+                    qrbox:250
                 },
                 scanBerhasil
             );
 
-        }else{
+            document.getElementById("hasil").innerHTML="";
 
-            document.getElementById("hasil").innerHTML="Kamera tidak ditemukan";
+        }catch(err){
+
+            document.getElementById("hasil").innerHTML=
+            "Kamera tidak dapat dibuka : "+err;
 
         }
-
-    }catch(err){
-
-        document.getElementById("hasil").innerHTML=err;
 
     }
 
@@ -90,9 +106,7 @@ async function scanBerhasil(qr){
     document.getElementById("hasil").innerHTML=hasil.message;
 
     setTimeout(function(){
-
         scanner.resume();
-
     },2000);
 
 }
