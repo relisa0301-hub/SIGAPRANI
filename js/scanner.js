@@ -123,7 +123,7 @@ async function scanBerhasil(qr){
         mapel:user.mapel
 
     });
-
+console.log(hasil);
     if(hasil.status){
 
         hasilBox.style.background="#d4edda";
