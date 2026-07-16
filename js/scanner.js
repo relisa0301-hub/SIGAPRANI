@@ -17,12 +17,26 @@ async function mulaiScanner(){
 updateCounter();
     let isi = "";
 
-    kelas.data.forEach(function(k){
-        isi += "<option value='"+k.nama+"'>"+k.nama+"</option>";
-    });
+   kelas.data.forEach(function(k){
+
+    isi += "<option value='"+k.nama+"' data-jumlah='"+k.jumlah+"'>"+k.nama+"</option>";
+
+});
 
     document.getElementById("kelas").innerHTML = isi;
+jumlahSiswa = Number(document.getElementById("kelas").options[0].dataset.jumlah);
 
+updateCounter();
+
+document.getElementById("kelas").onchange=function(){
+
+jumlahSiswa=Number(this.options[this.selectedIndex].dataset.jumlah);
+
+jumlahHadir=0;
+
+updateCounter();
+
+}
     let jam = "";
 
     for(let i=1;i<=10;i++){
