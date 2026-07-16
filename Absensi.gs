@@ -112,8 +112,24 @@ function prosesScan(data){
 
     status:true,
 
-    message:"Absensi Berhasil"
+    message:"Absensi Berhasil",
 
-  };
+    data:{
 
-}
+        nama:nama,
+
+        kelas:kelas,
+
+        jam:data.jam,
+
+        mapel:data.mapel,
+
+        waktu:Utilities.formatDate(
+            new Date(),
+            "Asia/Jakarta",
+            "HH:mm:ss"
+        )
+
+    }
+
+};
