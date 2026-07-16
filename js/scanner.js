@@ -195,7 +195,6 @@ tbody.deleteRow(10);
 
 }
 
-}
 function updateCounter(){
 
 document.getElementById("counter").innerHTML=
