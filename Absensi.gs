@@ -100,19 +100,13 @@ function prosesScan(data){
 
   ]);
 
-  kirimWAOtomatis(
-
-      wa,
-
-      nama,
-
-      kelas,
-
-      data.mapel,
-
-      data.guru
-
-  );
+  // kirimWAOtomatis(
+//      wa,
+//      nama,
+//      kelas,
+//      data.mapel,
+//      data.guru
+// );
 
   return{
 
