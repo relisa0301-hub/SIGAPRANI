@@ -2,98 +2,97 @@ let scanner;
 
 async function mulaiScanner(){
 
-const user=JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
+    const user = JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
 
-if(user==null){
+    if(!user){
+        window.location="index.html";
+        return;
+    }
 
-window.location="index.html";
+    document.getElementById("mapel").innerHTML =
+        "<option value='"+user.mapel+"'>"+user.mapel+"</option>";
 
-return;
+    const kelas = await getAPI("kelas");
 
-}
+    let isi = "";
 
-document.getElementById("mapel").innerHTML=
+    kelas.data.forEach(function(k){
+        isi += "<option value='"+k.nama+"'>"+k.nama+"</option>";
+    });
 
-"<option value='"+user.mapel+"'>"+user.mapel+"</option>";
+    document.getElementById("kelas").innerHTML = isi;
 
-const kelas = await getAPI("kelas");
-alert("API KELAS DIPANGGIL");
-alert(JSON.stringify(kelas));
-alert(JSON.stringify(kelas));
-let isi="<option value=''>Pilih Kelas</option>";
+    let jam = "";
 
-kelas.data.forEach(function(k){
+    for(let i=1;i<=10;i++){
+        jam += "<option value='"+i+"'>Jam Pelajaran "+i+"</option>";
+    }
 
-isi+="<option value='"+k.nama+"'>"+k.nama+"</option>";
+    document.getElementById("jam").innerHTML = jam;
 
-});
+    scanner = new Html5Qrcode("reader");
 
-document.getElementById("kelas").innerHTML=isi;
+    try{
 
-let jam="";
+        const devices = await Html5Qrcode.getCameras();
 
-for(let i=1;i<=10;i++){
+        if(devices && devices.length){
 
-jam+="<option value='"+i+"'>Jam Pelajaran "+i+"</option>";
+            const cameraId = devices[devices.length-1].id;
 
-}
+            await scanner.start(
+                cameraId,
+                {
+                    fps:10,
+                    qrbox:{width:250,height:250}
+                },
+                scanBerhasil
+            );
 
-document.getElementById("jam").innerHTML=jam;
+        }else{
 
-scanner=new Html5Qrcode("reader");
+            document.getElementById("hasil").innerHTML="Kamera tidak ditemukan";
 
-scanner.start(
+        }
 
-{
+    }catch(err){
 
-facingMode:"environment"
+        document.getElementById("hasil").innerHTML=err;
 
-},
-
-{
-
-fps:10,
-
-qrbox:250
-
-},
-
-scanBerhasil
-
-);
+    }
 
 }
 
 async function scanBerhasil(qr){
 
-scanner.pause();
+    scanner.pause();
 
-document.getElementById("hasil").innerHTML="Memproses...";
+    document.getElementById("hasil").innerHTML="Memproses...";
 
-const user=JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
+    const user = JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
 
-const hasil=await postAPI({
+    const hasil = await postAPI({
 
-action:"scan",
+        action:"scan",
 
-qr:qr,
+        qr:qr,
 
-kelas:document.getElementById("kelas").value,
+        kelas:document.getElementById("kelas").value,
 
-jam:document.getElementById("jam").value,
+        jam:document.getElementById("jam").value,
 
-guru:user.nama,
+        guru:user.nama,
 
-mapel:user.mapel
+        mapel:user.mapel
 
-});
+    });
 
-document.getElementById("hasil").innerHTML=hasil.message;
+    document.getElementById("hasil").innerHTML=hasil.message;
 
-setTimeout(function(){
+    setTimeout(function(){
 
-scanner.resume();
+        scanner.resume();
 
-},3000);
+    },2000);
 
 }
