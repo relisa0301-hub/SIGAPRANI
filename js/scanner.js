@@ -25,12 +25,20 @@ updateCounter();
 });
 
     document.getElementById("kelas").innerHTML = isi;
+    document.getElementById("infoKelas").innerHTML =
+document.getElementById("kelas").value;
+
+document.getElementById("infoMapel").innerHTML =
+user.mapel;
+
+document.getElementById("infoJam").innerHTML =
+"Jam Pelajaran 1";
 jumlahSiswa = Number(document.getElementById("kelas").options[0].dataset.jumlah);
 
 updateCounter();
 
 document.getElementById("kelas").onchange=function(){
-
+document.getElementById("infoKelas").innerHTML=this.value;
 jumlahSiswa=Number(this.options[this.selectedIndex].dataset.jumlah);
 
 jumlahHadir=0;
@@ -45,7 +53,12 @@ updateCounter();
     }
 
     document.getElementById("jam").innerHTML = jam;
+document.getElementById("jam").onchange=function(){
 
+document.getElementById("infoJam").innerHTML=
+"Jam Pelajaran "+this.value;
+
+};
     document.getElementById("hasil").innerHTML="Membuka kamera...";
 
     scanner = new Html5Qrcode("reader");
