@@ -1,14 +1,11 @@
 async function postAPI(data){
 
-    const formData = new FormData();
-
-    for(const key in data){
-        formData.append(key,data[key]);
-    }
-
     const response = await fetch(CONFIG.API_URL,{
         method:"POST",
-        body:formData
+        headers:{
+            "Content-Type":"text/plain;charset=utf-8"
+        },
+        body:JSON.stringify(data)
     });
 
     return await response.json();
