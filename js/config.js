@@ -4,7 +4,7 @@ const CONFIG = {
 
     VERSION: "4.0",
 
-    API_URL: "https://script.google.com/macros/s/AKfycby5TYVlbTQOoE3hIYrkM5xRpLbW7DatqvKYUrk9mCIBovc_UYg1y1QxiV-PZHt6lmk/exec",
+    API_URL: "https://script.google.com/macros/s/AKfycbzxA6B9iTRoo0Vpz6ZP9_StKZT_QX3vFUfy9gAYfVGgxtdFJr5WGXEFGiGYDbymMqgr/exec",
 
     SESSION_KEY: "SIGAP_RANI_LOGIN"
 
