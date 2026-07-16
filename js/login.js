@@ -4,44 +4,38 @@ async function login() {
     const password = document.getElementById("password").value.trim();
     const info = document.getElementById("info");
 
-    if (email === "" || password === "") {
-        info.innerHTML = "Email dan Password harus diisi.";
+    if(email=="" || password==""){
+        info.innerHTML="Email dan Password harus diisi";
         return;
     }
 
-    info.innerHTML = "Sedang login...";
+    info.innerHTML="Sedang login...";
 
-    try {
+    const hasil = await postAPI({
 
-        const response = await fetch(CONFIG.API_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "login",
-                email: email,
-                password: password
-            })
-        });
+        action:"login",
 
-        const result = await response.json();
+        email:email,
 
-        if (result.status) {
+        password:password
 
-            localStorage.setItem(
-                CONFIG.SESSION_KEY,
-                JSON.stringify(result.data)
-            );
+    });
 
-            window.location.href = "dashboard.html";
+    if(hasil.status){
 
-        } else {
+        localStorage.setItem(
 
-            info.innerHTML = result.message;
+            CONFIG.SESSION_KEY,
 
-        }
+            JSON.stringify(hasil.data)
 
-    } catch (e) {
+        );
 
-        info.innerHTML = "Koneksi ke server gagal.";
+        window.location="dashboard.html";
+
+    }else{
+
+        info.innerHTML=hasil.message;
 
     }
 
