@@ -197,8 +197,19 @@ tbody.deleteRow(10);
 
 function updateCounter(){
 
-document.getElementById("counter").innerHTML=
+    document.getElementById("counter").innerHTML =
+    "Hadir : " + jumlahHadir + " / " + jumlahSiswa;
 
-"Hadir : "+jumlahHadir+" / "+jumlahSiswa;
+    let persen = 0;
+
+    if(jumlahSiswa > 0){
+        persen = Math.round((jumlahHadir / jumlahSiswa) * 100);
+    }
+
+    document.getElementById("persenHadir").innerHTML =
+    persen + "%";
+
+    document.getElementById("progressBar").style.width =
+    persen + "%";
 
 }
