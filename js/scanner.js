@@ -130,13 +130,7 @@ async function scanBerhasil(qr){
         hasilBox.style.border="2px solid #28a745";
 
        hasilBox.innerHTML=
-"<h3>✅ "+hasil.message+"</h3>"+
-"<hr>"+
-"<b>Nama :</b> "+hasil.nama+"<br>"+
-"<b>Kelas :</b> "+hasil.kelas+"<br>"+
-"<b>Mapel :</b> "+hasil.mapel+"<br>"+
-"<b>Guru :</b> "+hasil.guru+"<br>"+
-"<b>Jam :</b> "+hasil.jam;
+"<pre>"+JSON.stringify(hasil,null,2)+"</pre>";
 tambahRiwayat(hasil);
         jumlahHadir++;
 
