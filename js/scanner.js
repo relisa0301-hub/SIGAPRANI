@@ -122,7 +122,7 @@ async function scanBerhasil(qr){
 "<b>Mapel :</b> "+hasil.mapel+"<br>"+
 "<b>Guru :</b> "+hasil.guru+"<br>"+
 "<b>Jam :</b> "+hasil.jam;
-
+tambahRiwayat(hasil);
         if(navigator.vibrate){
             navigator.vibrate(200);
         }
@@ -155,5 +155,22 @@ async function scanBerhasil(qr){
         scanner.resume();
 
     },2500);
+
+}
+function tambahRiwayat(data){
+
+const tbody=document.querySelector("#riwayat tbody");
+
+const row=tbody.insertRow(0);
+
+row.insertCell(0).innerHTML=data.jam;
+row.insertCell(1).innerHTML=data.nama;
+row.insertCell(2).innerHTML=data.kelas;
+
+if(tbody.rows.length>10){
+
+tbody.deleteRow(10);
+
+}
 
 }
