@@ -1,5 +1,7 @@
 let scanner;
-alert("SCANNER VERSI BARU");
+alert("SCANNER VERSI 17 JULI");
+
+let scanner;
 let jumlahHadir = 0;
 let jumlahSiswa = 0;
 async function mulaiScanner(){
