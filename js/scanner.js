@@ -114,8 +114,14 @@ async function scanBerhasil(qr){
         hasilBox.style.color="#155724";
         hasilBox.style.border="2px solid #28a745";
 
-        hasilBox.innerHTML=
-        "✅ "+hasil.message;
+       hasilBox.innerHTML=
+"<h3>✅ "+hasil.message+"</h3>"+
+"<hr>"+
+"<b>Nama :</b> "+hasil.nama+"<br>"+
+"<b>Kelas :</b> "+hasil.kelas+"<br>"+
+"<b>Mapel :</b> "+hasil.mapel+"<br>"+
+"<b>Guru :</b> "+hasil.guru+"<br>"+
+"<b>Jam :</b> "+hasil.jam;
 
         if(navigator.vibrate){
             navigator.vibrate(200);
