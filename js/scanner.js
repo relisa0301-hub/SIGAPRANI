@@ -22,6 +22,7 @@ action:"kelas"
 
 });
 
+alert(JSON.stringify(kelas));
 let isi="<option value=''>Pilih Kelas</option>";
 
 kelas.data.forEach(function(k){
