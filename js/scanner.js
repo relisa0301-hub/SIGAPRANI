@@ -212,7 +212,10 @@ function updateCounter(){
 
     document.getElementById("counter").innerHTML =
     "Hadir : " + jumlahHadir + " / " + jumlahSiswa;
+const belum = jumlahSiswa - jumlahHadir;
 
+document.getElementById("belumHadir").innerHTML =
+"Belum Hadir : " + belum;
     let persen = 0;
 
     if(jumlahSiswa > 0){
