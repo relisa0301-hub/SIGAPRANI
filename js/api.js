@@ -15,8 +15,14 @@ async function postAPI(data){
 async function getAPI(action){
 
     const response = await fetch(
-        CONFIG.API_URL+"?action="+action
-        async function getBelumHadir(kelas,jam,mapel){
+        CONFIG.API_URL + "?action=" + action
+    );
+
+    return await response.json();
+
+}
+
+async function getBelumHadir(kelas,jam,mapel){
 
     return await postAPI({
 
@@ -29,10 +35,5 @@ async function getAPI(action){
         mapel:mapel
 
     });
-
-}
-    );
-
-    return await response.json();
 
 }
