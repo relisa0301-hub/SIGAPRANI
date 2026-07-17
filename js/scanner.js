@@ -341,7 +341,7 @@ function updateCounter(){
             document.getElementById("mapel").value
 
         );
-
+updateCounter();
         const div =
             document.getElementById("listBelumHadir");
 
