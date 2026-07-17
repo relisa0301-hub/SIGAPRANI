@@ -1,1 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Laporan Absensi | SIGAP RANI</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/laporan.js"></script>
+
+<style>
+
+body{
+    background:#f4f7fb;
+    font-family:Poppins,Arial,sans-serif;
+    margin:0;
+}
+
+.topbar{
+    background:#1565C0;
+    color:white;
+    padding:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.topbar button{
+    background:white;
+    color:#1565C0;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.container{
+    width:95%;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.filter{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+}
+
+.filter input,
+.filter select{
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:15px;
+}
+
+.btn{
+    background:#1565C0;
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:12px;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#0D47A1;
+}
+
+.statistik{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+}
+
+.box{
+    background:#1565C0;
+    color:white;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+}
+
+.box h1{
+    margin:0;
+    font-size:36px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#1565C0;
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
+
+tr:hover{
+    background:#f0f6ff;
+}
+
+.action{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:15px;
+}
+
+</style>
+
+</head>
+
+<body onload="loadLaporan()">
+
+<div class="topbar">
+
+<h2>📊 LAPORAN ABSENSI</h2>
+
+<button onclick="location='dashboard.html'">
+
+Dashboard
+
+</button>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Filter Laporan</h3>
+
+<div class="filter">
+
+<input type="date" id="tgl">
+
+<select id="kelas">
+
+<option value="">Semua Kelas</option>
+
+</select>
+
+<select id="mapel">
+
+<option value="">Semua Mapel</option>
+
+</select>
+
+<input
+type="text"
+id="cari"
+placeholder="Cari Nama Siswa">
+
+</div>
+
+<div class="action">
+
+<button class="btn" onclick="loadLaporan()">
+
+🔄 Tampilkan
+
+</button>
+
+<button class="btn" onclick="exportPDF()">
+
+🖨 Export PDF
+
+</button>
+
+<button class="btn" onclick="exportExcel()">
+
+📗 Export Excel
+
+</button>
+
+</div>
+
+</div>
+
+<div class="statistik">
+
+<div class="box">
+
+<h1 id="totalData">0</h1>
+
+Total Data
+
+</div>
+
+<div class="box">
+
+<h1 id="hadir">0</h1>
+
+Hadir
+
+</div>
+
+<div class="box">
+
+<h1 id="tidak">0</h1>
+
+Tidak Hadir
+
+</div>
+
+<div class="box">
+
+<h1 id="persen">0%</h1>
+
+Persentase
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Data Absensi</h3>
+
+<table id="tblLaporan">
+
+<thead>
+
+<tr>
+
+<th>No</th>
+
+<th>Tanggal</th>
+
+<th>Jam</th>
+
+<th>Nama</th>
+
+<th>Kelas</th>
+
+<th>Mapel</th>
+
+<th>Guru</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td colspan="8" align="center">
+
+Memuat Data...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>
