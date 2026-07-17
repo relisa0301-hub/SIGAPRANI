@@ -51,9 +51,8 @@ async function mulaiScanner(){
 
     updateCounter();
 
-    await tampilBelumHadir();
 
-    document.getElementById("kelas").onchange = async function(){
+  
 
         document.getElementById("infoKelas").innerHTML = this.value;
 
@@ -64,12 +63,10 @@ async function mulaiScanner(){
 
         updateCounter();
 
-        await tampilBelumHadir();
-
+      
     };
 
-    document.getElementById("jam").onchange = async function(){
-
+   
         document.getElementById("infoJam").innerHTML =
         "Jam Pelajaran " + this.value;
 
@@ -158,7 +155,6 @@ async function scanBerhasil(qr){
 
     });    console.log(hasil);
 
-    if(hasil.status){
 
         hasilBox.style.background="#d4edda";
         hasilBox.style.color="#155724";
@@ -186,8 +182,7 @@ async function scanBerhasil(qr){
 
         updateCounter();
 
-        await tampilBelumHadir();
-
+       
         if(navigator.vibrate){
 
             navigator.vibrate(200);
