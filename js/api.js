@@ -16,6 +16,21 @@ async function getAPI(action){
 
     const response = await fetch(
         CONFIG.API_URL+"?action="+action
+        async function getBelumHadir(kelas,jam,mapel){
+
+    return await postAPI({
+
+        action:"belumHadir",
+
+        kelas:kelas,
+
+        jam:jam,
+
+        mapel:mapel
+
+    });
+
+}
     );
 
     return await response.json();
