@@ -243,3 +243,44 @@ if(persen < 50){
 
 }
 }
+async function tampilBelumHadir(){
+
+    const hasil = await getBelumHadir(
+
+        document.getElementById("kelas").value,
+
+        document.getElementById("jam").value,
+
+        document.getElementById("mapel").value
+
+    );
+
+    const div = document.getElementById("listBelumHadir");
+
+    if(!hasil.status){
+
+        div.innerHTML = "Gagal memuat data.";
+
+        return;
+
+    }
+
+    if(hasil.data.length==0){
+
+        div.innerHTML = "🎉 Semua siswa sudah hadir.";
+
+        return;
+
+    }
+
+    let html="";
+
+    hasil.data.forEach(function(s){
+
+        html += "• "+s.nama+"<br>";
+
+    });
+
+    div.innerHTML = html;
+
+}
