@@ -1,122 +1,160 @@
-let scanner;
+let scanner = null;
 
 let jumlahHadir = 0;
 let jumlahSiswa = 0;
 
-async function mulaiScanner(){
+async function mulaiScanner() {
 
-    const user = JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
+    const user = JSON.parse(
+        localStorage.getItem(CONFIG.SESSION_KEY)
+    );
 
-    if(!user){
-        window.location="index.html";
+    if (!user) {
+        window.location = "index.html";
         return;
     }
 
     document.getElementById("mapel").innerHTML =
-        "<option value='"+user.mapel+"'>"+user.mapel+"</option>";
+        "<option value='" + user.mapel + "'>" +
+        user.mapel +
+        "</option>";
 
-    const kelas = await getAPI("kelas");
+    const dataKelas = await getAPI("kelas");
 
-    let isi="";
+    if (!dataKelas.status) {
 
-    kelas.data.forEach(function(k){
+        document.getElementById("hasil").innerHTML =
+            "Data kelas gagal dimuat.";
 
-        isi += "<option value='"+k.nama+"' data-jumlah='"+k.jumlah+"'>"+k.nama+"</option>";
-
-    });
-
-    document.getElementById("kelas").innerHTML = isi;
-
-    document.getElementById("infoKelas").innerHTML =
-    document.getElementById("kelas").value;
-
-    document.getElementById("infoMapel").innerHTML =
-    user.mapel;
-
-    jumlahSiswa =
-    Number(document.getElementById("kelas").options[0].dataset.jumlah);
-
-    let jam="";
-
-    for(let i=1;i<=10;i++){
-
-        jam += "<option value='"+i+"'>Jam Pelajaran "+i+"</option>";
+        return;
 
     }
 
-    document.getElementById("jam").innerHTML = jam;
+    let option = "";
+
+    dataKelas.data.forEach(function (k) {
+
+        option +=
+            "<option value='" + k.nama +
+            "' data-jumlah='" + k.jumlah +
+            "'>" +
+            k.nama +
+            "</option>";
+
+    });
+
+    document.getElementById("kelas").innerHTML = option;
+
+    jumlahSiswa =
+        Number(
+            document.getElementById("kelas")
+                .options[0]
+                .dataset.jumlah
+        );
+
+    jumlahHadir = 0;
+
+    document.getElementById("infoKelas").innerHTML =
+        document.getElementById("kelas").value;
+
+    document.getElementById("infoMapel").innerHTML =
+        user.mapel;
+
+    let jamOption = "";
+
+    for (let i = 1; i <= 10; i++) {
+
+        jamOption +=
+            "<option value='" + i + "'>" +
+            "Jam Pelajaran " + i +
+            "</option>";
+
+    }
+
+    document.getElementById("jam").innerHTML =
+        jamOption;
 
     document.getElementById("infoJam").innerHTML =
-    "Jam Pelajaran 1";
+        "Jam Pelajaran 1";
 
     updateCounter();
 
+    document.getElementById("kelas").onchange =
+        async function () {
 
-  
+            document.getElementById("infoKelas").innerHTML =
+                this.value;
 
-        document.getElementById("infoKelas").innerHTML = this.value;
+            jumlahSiswa =
+                Number(
+                    this.options[
+                        this.selectedIndex
+                    ].dataset.jumlah
+                );
 
-        jumlahSiswa =
-        Number(this.options[this.selectedIndex].dataset.jumlah);
+            jumlahHadir = 0;
 
-        jumlahHadir = 0;
+            updateCounter();
 
-        updateCounter();
+            await tampilBelumHadir();
 
-      
-    };
+        };
 
-   
-        document.getElementById("infoJam").innerHTML =
-        "Jam Pelajaran " + this.value;
+    document.getElementById("jam").onchange =
+        async function () {
 
-        await tampilBelumHadir();
+            document.getElementById("infoJam").innerHTML =
+                "Jam Pelajaran " + this.value;
 
-    };
+            await tampilBelumHadir();
+
+        };
 
     document.getElementById("hasil").innerHTML =
-    "Membuka kamera...";
+        "Membuka kamera...";
+
+    await tampilBelumHadir();
 
     scanner = new Html5Qrcode("reader");
 
-    try{
+    try {
 
         await scanner.start(
             {
-                facingMode:{
-                    exact:"environment"
+                facingMode: {
+                    exact: "environment"
                 }
             },
             {
-                fps:10,
-                qrbox:250
+                fps: 10,
+                qrbox: 250
             },
             scanBerhasil
         );
 
-        document.getElementById("hasil").innerHTML="";
+        document.getElementById("hasil").innerHTML = "";
 
-    }catch(e){
+    } catch (e) {
 
-        try{
+        try {
 
             await scanner.start(
                 {
-                    facingMode:"environment"
+                    facingMode: "environment"
                 },
                 {
-                    fps:10,
-                    qrbox:250
+                    fps: 10,
+                    qrbox: 250
                 },
                 scanBerhasil
             );
 
-            document.getElementById("hasil").innerHTML="";
+            document.getElementById("hasil").innerHTML = "";
 
-        }catch(err){
+        } catch (err) {
 
             document.getElementById("hasil").innerHTML =
-            "Kamera tidak dapat dibuka : " + err;
+                "Kamera tidak dapat dibuka : " + err;
 
         }
 
@@ -124,57 +162,53 @@ async function mulaiScanner(){
 
 }
 
-async function scanBerhasil(qr){
+async function scanBerhasil(qr) {
 
     scanner.pause();
 
     const hasilBox =
-    document.getElementById("hasil");
+        document.getElementById("hasil");
 
-    hasilBox.style.padding="15px";
-    hasilBox.style.borderRadius="10px";
-    hasilBox.style.fontWeight="bold";
-    hasilBox.innerHTML="Memproses...";
+    hasilBox.style.padding = "15px";
+    hasilBox.style.borderRadius = "10px";
+    hasilBox.style.fontWeight = "bold";
+    hasilBox.innerHTML = "Memproses...";
 
-    const user =
-    JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
+    const user = JSON.parse(
+        localStorage.getItem(CONFIG.SESSION_KEY)
+    );
 
     const hasil = await postAPI({
 
-        action:"scan",
+        action: "scan",
 
-        qr:qr,
+        qr: qr,
 
-        kelas:document.getElementById("kelas").value,
+        kelas:
+            document.getElementById("kelas").value,
 
-        jam:document.getElementById("jam").value,
+        jam:
+            document.getElementById("jam").value,
 
-        guru:user.nama,
+        guru: user.nama,
 
-        mapel:user.mapel
+        mapel: user.mapel
 
-    });    console.log(hasil);
+    });
+    if (hasil.status) {
 
+        hasilBox.style.background = "#d4edda";
+        hasilBox.style.color = "#155724";
+        hasilBox.style.border = "2px solid #28a745";
 
-        hasilBox.style.background="#d4edda";
-        hasilBox.style.color="#155724";
-        hasilBox.style.border="2px solid #28a745";
-
-        hasilBox.innerHTML=
-
-        "<h3>✅ "+hasil.message+"</h3>"+
-
-        "<hr>"+
-
-        "<b>Nama :</b> "+(hasil.nama||"-")+"<br>"+
-
-        "<b>Kelas :</b> "+(hasil.kelas||"-")+"<br>"+
-
-        "<b>Mapel :</b> "+(hasil.mapel||"-")+"<br>"+
-
-        "<b>Guru :</b> "+(hasil.guru||"-")+"<br>"+
-
-        "<b>Jam :</b> "+(hasil.jam||"-");
+        hasilBox.innerHTML =
+            "<h3>✅ " + hasil.message + "</h3>" +
+            "<hr>" +
+            "<b>Nama :</b> " + (hasil.nama || "-") + "<br>" +
+            "<b>Kelas :</b> " + (hasil.kelas || "-") + "<br>" +
+            "<b>Mapel :</b> " + (hasil.mapel || "-") + "<br>" +
+            "<b>Guru :</b> " + (hasil.guru || "-") + "<br>" +
+            "<b>Jam :</b> " + (hasil.jam || "-");
 
         tambahRiwayat(hasil);
 
@@ -182,44 +216,38 @@ async function scanBerhasil(qr){
 
         updateCounter();
 
-       
-        if(navigator.vibrate){
+        await tampilBelumHadir();
 
+        if (navigator.vibrate) {
             navigator.vibrate(200);
-
         }
 
-        try{
-
+        try {
             new Audio("success.mp3").play();
+        } catch (e) {}
 
-        }catch(e){}
+    } else {
 
-    }else{
+        hasilBox.style.background = "#f8d7da";
+        hasilBox.style.color = "#721c24";
+        hasilBox.style.border = "2px solid #dc3545";
 
-        hasilBox.style.background="#f8d7da";
+        hasilBox.innerHTML =
+            "❌ " + hasil.message;
 
-        hasilBox.style.color="#721c24";
-
-        hasilBox.style.border="2px solid #dc3545";
-
-        hasilBox.innerHTML="❌ "+hasil.message;
-
-        if(navigator.vibrate){
-
+        if (navigator.vibrate) {
             navigator.vibrate([100,100,100]);
-
         }
 
     }
 
     setTimeout(function(){
 
-        hasilBox.innerHTML="";
+        hasilBox.innerHTML = "";
 
-        hasilBox.style.background="";
+        hasilBox.style.background = "";
 
-        hasilBox.style.border="";
+        hasilBox.style.border = "";
 
         scanner.resume();
 
@@ -227,23 +255,20 @@ async function scanBerhasil(qr){
 
 }
 
-
-
 function tambahRiwayat(data){
 
-    const tbody=document.querySelector("#riwayat tbody");
+    const tbody =
+        document.querySelector("#riwayat tbody");
 
-    const row=tbody.insertRow(0);
+    const row =
+        tbody.insertRow(0);
 
-    row.innerHTML=
+    row.innerHTML =
+        "<td>" + data.jam + "</td>" +
+        "<td>" + data.nama + "</td>" +
+        "<td>" + data.kelas + "</td>";
 
-    "<td>"+data.jam+"</td>"+
-
-    "<td>"+data.nama+"</td>"+
-
-    "<td>"+data.kelas+"</td>";
-
-    while(tbody.rows.length>10){
+    while(tbody.rows.length > 10){
 
         tbody.deleteRow(10);
 
@@ -251,56 +276,59 @@ function tambahRiwayat(data){
 
 }
 
-
-
 function updateCounter(){
 
-    document.getElementById("counter").innerHTML=
+    document.getElementById("counter").innerHTML =
+        "Hadir : " +
+        jumlahHadir +
+        " / " +
+        jumlahSiswa;
 
-    "Hadir : "+jumlahHadir+" / "+jumlahSiswa;
+    const belum =
+        jumlahSiswa - jumlahHadir;
 
-    const belum=jumlahSiswa-jumlahHadir;
+    document.getElementById("belumHadir").innerHTML =
+        "Belum Hadir : " + belum;
 
-    document.getElementById("belumHadir").innerHTML=
+    let persen = 0;
 
-    "Belum Hadir : "+belum;
+    if(jumlahSiswa > 0){
 
-    let persen=0;
-
-    if(jumlahSiswa>0){
-
-        persen=Math.round(
-
-            (jumlahHadir/jumlahSiswa)*100
-
-        );
+        persen =
+            Math.round(
+                (jumlahHadir / jumlahSiswa) * 100
+            );
 
     }
 
-    document.getElementById("persenHadir").innerHTML=
+    document.getElementById("persenHadir").innerHTML =
+        persen + "%";
 
-    persen+"%";
+    document.getElementById("progressBar").style.width =
+        persen + "%";
 
-    document.getElementById("progressBar").style.width=
+    const bar =
+        document.getElementById("progressBar");
 
-    persen+"%";
+    if(persen < 50){
 
-    const bar=document.getElementById("progressBar");
+        bar.style.background =
+            "#dc3545";
 
-    if(persen<50){
+    }else if(persen < 80){
 
-        bar.style.background="#dc3545";
-
-    }else if(persen<80){
-
-        bar.style.background="#ffc107";
+        bar.style.background =
+            "#ffc107";
 
     }else{
 
-        bar.style.background="#28a745";
+        bar.style.background =
+            "#28a745";
 
     }
-async function tampilBelumHadir(){
+
+}
+ async function tampilBelumHadir(){
 
     try{
 
@@ -314,7 +342,8 @@ async function tampilBelumHadir(){
 
         );
 
-        const div = document.getElementById("listBelumHadir");
+        const div =
+            document.getElementById("listBelumHadir");
 
         if(!div){
             return;
@@ -323,33 +352,34 @@ async function tampilBelumHadir(){
         if(!hasil.status){
 
             div.innerHTML =
-            "<span style='color:red'>Gagal memuat data.</span>";
+                "<span style='color:red'>Gagal memuat data.</span>";
 
             return;
 
         }
 
-        if(hasil.data.length==0){
+        if(hasil.data.length===0){
 
             div.innerHTML =
-            "<span style='color:green'>🎉 Semua siswa sudah hadir.</span>";
+                "<span style='color:green'>🎉 Semua siswa sudah hadir.</span>";
 
             return;
 
         }
 
         let html =
-        "<b>"+hasil.data.length+
-        " siswa belum hadir</b><hr>";
+            "<b>" +
+            hasil.data.length +
+            " siswa belum hadir</b><hr>";
 
         hasil.data.forEach(function(s){
 
             html +=
-            "• "+
-            s.nis+
-            " - "+
-            s.nama+
-            "<br>";
+                "• " +
+                s.nis +
+                " - " +
+                s.nama +
+                "<br>";
 
         });
 
@@ -359,16 +389,206 @@ async function tampilBelumHadir(){
 
         console.log(err);
 
-        const div=document.getElementById("listBelumHadir");
+        const div =
+            document.getElementById("listBelumHadir");
 
         if(div){
 
             div.innerHTML =
-            "<span style='color:red'>Tidak dapat mengambil data.</span>";
+                "<span style='color:red'>Tidak dapat mengambil data.</span>";
 
         }
 
     }
 
 }
+
+async function refreshBelumHadir(){
+
+    await tampilBelumHadir();
+
 }
+
+async function refreshCounter(){
+
+    updateCounter();
+
+    await tampilBelumHadir();
+
+}
+
+function resetScanner(){
+
+    jumlahHadir = 0;
+
+    updateCounter();
+
+    tampilBelumHadir();
+
+}
+
+function stopScanner(){
+
+    if(scanner){
+
+        scanner.stop()
+
+        .then(function(){
+
+            console.log("Scanner berhenti");
+
+        })
+
+        .catch(function(err){
+
+            console.log(err);
+
+        });
+
+    }
+
+}
+
+window.onbeforeunload = function(){
+
+    stopScanner();
+
+};   console.log(hasil);async function reloadDataScan(){
+
+    jumlahHadir = 0;
+
+    updateCounter();
+
+    await tampilBelumHadir();
+
+}
+
+function bukaDashboard(){
+
+    stopScanner();
+
+    window.location = "dashboard.html";
+
+}
+
+function restartScanner(){
+
+    if(scanner){
+
+        scanner.resume();
+
+    }
+
+}
+
+function pauseScanner(){
+
+    if(scanner){
+
+        scanner.pause();
+
+    }
+
+}
+
+function lanjutScanner(){
+
+    if(scanner){
+
+        scanner.resume();
+
+    }
+
+}
+
+function bunyiSukses(){
+
+    try{
+
+        new Audio("success.mp3").play();
+
+    }catch(e){
+
+        console.log(e);
+
+    }
+
+}
+
+function getJumlahHadir(){
+
+    return jumlahHadir;
+
+}
+
+function getJumlahSiswa(){
+
+    return jumlahSiswa;
+
+}
+
+function setJumlahHadir(nilai){
+
+    jumlahHadir = nilai;
+
+    updateCounter();
+
+}
+
+function setJumlahSiswa(nilai){
+
+    jumlahSiswa = nilai;
+
+    updateCounter();
+
+}
+
+function destroyScanner(){
+
+    if(scanner){
+
+        scanner.stop()
+
+        .then(function(){
+
+            scanner.clear();
+
+            scanner = null;
+
+        })
+
+        .catch(function(err){
+
+            console.log(err);
+
+        });
+
+    }
+
+}
+
+window.addEventListener("beforeunload",function(){
+
+    destroyScanner();
+
+});
+
+window.addEventListener("pagehide",function(){
+
+    destroyScanner();
+
+});
+
+document.addEventListener("visibilitychange",function(){
+
+    if(document.hidden){
+
+        pauseScanner();
+
+    }else{
+
+        lanjutScanner();
+
+    }
+
+});
