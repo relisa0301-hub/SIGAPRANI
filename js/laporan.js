@@ -12,9 +12,19 @@ async function loadLaporan(){
 
     try{
 
-        const hasil = await postAPI({
-            action:"laporan"
-        });
+       const hasil = await postAPI({
+
+    action:"laporan",
+
+    tanggal:document.getElementById("tgl").value,
+
+    kelas:document.getElementById("kelas").value,
+
+    mapel:document.getElementById("mapel").value,
+
+    cari:document.getElementById("cari").value
+
+});
 
         if(!hasil.status){
 
@@ -106,7 +116,13 @@ function exportPDF(){
 }
 
 function exportExcel(){
+document.getElementById("tgl").onchange=loadLaporan;
 
+document.getElementById("kelas").onchange=loadLaporan;
+
+document.getElementById("mapel").onchange=loadLaporan;
+
+document.getElementById("cari").onkeyup=loadLaporan;
     alert("Export Excel akan kita aktifkan pada revisi berikutnya.");
 
 }
