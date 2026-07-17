@@ -224,5 +224,19 @@ function updateCounter(){
 
     document.getElementById("progressBar").style.width =
     persen + "%";
+const bar = document.getElementById("progressBar");
 
+if(persen < 50){
+
+    bar.style.background = "#dc3545";
+
+}else if(persen < 80){
+
+    bar.style.background = "#ffc107";
+
+}else{
+
+    bar.style.background = "#28a745";
+
+}
 }
