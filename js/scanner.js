@@ -37,6 +37,8 @@ jumlahSiswa = Number(document.getElementById("kelas").options[0].dataset.jumlah)
 
 updateCounter();
 
+await tampilBelumHadir();
+
 document.getElementById("kelas").onchange=function(){
 document.getElementById("infoKelas").innerHTML=this.value;
 jumlahSiswa=Number(this.options[this.selectedIndex].dataset.jumlah);
