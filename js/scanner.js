@@ -453,14 +453,14 @@ window.onbeforeunload = function(){
 
     stopScanner();
 
-};   console.log(hasil);async function reloadDataScan(){
+};   window.onbeforeunload = function () {
+    stopScanner();
+};
 
+async function reloadDataScan() {
     jumlahHadir = 0;
-
     updateCounter();
-
     await tampilBelumHadir();
-
 }
 
 function bukaDashboard(){
