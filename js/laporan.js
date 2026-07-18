@@ -27,7 +27,7 @@ async function loadLaporan(){
             mapel: document.getElementById('mapel').value,
             cari: document.getElementById('cari').value
         });
-
+console.log(hasil);
         if(!hasil.status || !hasil.data){
 
             tbody.innerHTML = `
