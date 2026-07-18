@@ -1,15 +1,15 @@
-/************************************************
+/*************************************************
  SIGAP RANI V4
  laporan.js
- Tidak mempengaruhi Scanner QR
-************************************************/
+ Tidak mengganggu Scanner QR
+*************************************************/
 
 let semuaData = [];
-let dataTampil = [];
+let dataFilter = [];
 
-window.onload = async function () {
+window.onload = function () {
 
-    await loadLaporan();
+    loadLaporan();
 
 };
 
@@ -25,30 +25,34 @@ async function loadLaporan() {
 
         if (!hasil.status) {
 
-            alert("Data laporan gagal dimuat.");
+            alert("Data laporan gagal dimuat");
 
             return;
 
         }
 
         semuaData = hasil.data;
-        dataTampil = hasil.data;
+        dataFilter = hasil.data;
 
         isiFilter();
         hitungStatistik();
-        tampilTabel(dataTampil);
+        tampilTabel(dataFilter);
 
     } catch (e) {
 
         console.log(e);
 
-        alert("Tidak dapat terhubung ke server.");
+        alert("Tidak dapat terhubung ke server");
 
     }
- function isiFilter() {
+ /*************************************************
+ MEMBUAT FILTER
+*************************************************/
 
-    const kelas = document.getElementById("filterKelas");
-    const mapel = document.getElementById("filterMapel");
+function isiFilter() {
+
+    const kelas = document.getElementById("kelas");
+    const mapel = document.getElementById("mapel");
 
     if (!kelas || !mapel) return;
 
@@ -58,24 +62,30 @@ async function loadLaporan() {
     mapel.innerHTML =
         "<option value=''>Semua Mapel</option>";
 
-    let daftarKelas = [];
-    let daftarMapel = [];
+    let listKelas = [];
+    let listMapel = [];
 
     semuaData.forEach(function (d) {
 
-        if (!daftarKelas.includes(d.kelas))
-            daftarKelas.push(d.kelas);
+        if (d.kelas && !listKelas.includes(d.kelas)) {
 
-        if (!daftarMapel.includes(d.mapel))
-            daftarMapel.push(d.mapel);
+            listKelas.push(d.kelas);
+
+        }
+
+        if (d.mapel && !listMapel.includes(d.mapel)) {
+
+            listMapel.push(d.mapel);
+
+        }
 
     });
 
-    daftarKelas.sort();
+    listKelas.sort();
 
-    daftarMapel.sort();
+    listMapel.sort();
 
-    daftarKelas.forEach(function (k) {
+    listKelas.forEach(function (k) {
 
         kelas.innerHTML +=
             "<option value='" + k + "'>" +
@@ -84,7 +94,7 @@ async function loadLaporan() {
 
     });
 
-    daftarMapel.forEach(function (m) {
+    listMapel.forEach(function (m) {
 
         mapel.innerHTML +=
             "<option value='" + m + "'>" +
@@ -94,81 +104,9 @@ async function loadLaporan() {
     });
 
 }
- /************************************************
- MENAMPILKAN TABEL LAPORAN
-************************************************/
-
-function tampilTabel(data){
-
-    const tbody = document.getElementById("tbodyLaporan");
-
-    if(!tbody){
-        return;
-    }
-
-    tbody.innerHTML = "";
-
-    if(data.length==0){
-
-        tbody.innerHTML =
-        "<tr><td colspan='10' style='text-align:center'>Tidak ada data</td></tr>";
-
-        return;
-
-    }
-
-    data.forEach(function(d,index){
-
-        let row = "<tr>";
-
-        row += "<td>"+(index+1)+"</td>";
-
-        row += "<td>"+formatTanggal(d.tanggal)+"</td>";
-
-        row += "<td>"+(d.jam||"-")+"</td>";
-
-        row += "<td>"+(d.nis||"-")+"</td>";
-
-        row += "<td>"+(d.nama||"-")+"</td>";
-
-        row += "<td>"+(d.kelas||"-")+"</td>";
-
-        row += "<td>"+(d.mapel||"-")+"</td>";
-
-        row += "<td>"+(d.guru||"-")+"</td>";
-
-        row += "<td>"+(d.status||"-")+"</td>";
-
-        row += "</tr>";
-
-        tbody.innerHTML += row;
-
-    });
-
-}
-
-function formatTanggal(tgl){
-
-    if(!tgl) return "-";
-
-    try{
-
-        const d = new Date(tgl);
-
-        return d.toLocaleDateString("id-ID");
-
-    }catch(e){
-
-        return tgl;
-
-    }
-
-}
-
-}
-/************************************************
- STATISTIK LAPORAN
-************************************************/
+ /*************************************************
+ STATISTIK
+*************************************************/
 
 function hitungStatistik(){
 
@@ -177,9 +115,9 @@ function hitungStatistik(){
     let hadir = 0;
     let tidak = 0;
 
-    semuaData.forEach(function(d){
+    semuaData.forEach(function(item){
 
-        if(String(d.status).trim()=="Hadir"){
+        if(String(item.status).trim().toLowerCase()=="hadir"){
 
             hadir++;
 
@@ -205,7 +143,82 @@ function hitungStatistik(){
 
     }
 
-    document.getElementById("persen").innerHTML =
-        persen + "%";
+    document.getElementById("persen").innerHTML = persen + "%";
+
+ 
+}
+ /*************************************************
+ FORMAT TANGGAL
+*************************************************/
+
+function formatTanggal(tanggal){
+
+    if(!tanggal) return "-";
+
+    try{
+
+        const d = new Date(tanggal);
+
+        return d.toLocaleDateString("id-ID");
+
+    }catch(e){
+
+        return tanggal;
+
+    }
+
+}
+ /*************************************************
+ MENAMPILKAN TABEL
+*************************************************/
+
+function tampilTabel(data){
+
+    const tbody = document.getElementById("tbodyLaporan");
+
+    if(!tbody){
+        return;
+    }
+
+    tbody.innerHTML = "";
+
+    if(data.length===0){
+
+        tbody.innerHTML =
+        "<tr><td colspan='8' align='center'>Tidak ada data</td></tr>";
+
+        return;
+
+    }
+
+    data.forEach(function(item,index){
+
+        let tr = "";
+
+        tr += "<tr>";
+
+        tr += "<td>"+(index+1)+"</td>";
+
+        tr += "<td>"+formatTanggal(item.tanggal)+"</td>";
+
+        tr += "<td>"+(item.jam||"-")+"</td>";
+
+        tr += "<td>"+(item.nama||"-")+"</td>";
+
+        tr += "<td>"+(item.kelas||"-")+"</td>";
+
+        tr += "<td>"+(item.mapel||"-")+"</td>";
+
+        tr += "<td>"+(item.guru||"-")+"</td>";
+
+        tr += "<td>"+(item.status||"-")+"</td>";
+
+        tr += "</tr>";
+
+        tbody.innerHTML += tr;
+
+    });
+
+}
 
 }
