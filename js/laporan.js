@@ -17,8 +17,8 @@ async function loadLaporan(){
 
     try{
 
-        await loadKelas();
-        await loadMapel();
+        //await loadKelas();
+        //await loadMapel();
 
         const hasil = await postAPI({
             action: 'laporan',
