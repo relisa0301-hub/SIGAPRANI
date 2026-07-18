@@ -2,7 +2,7 @@
  SIGAP RANI V4
  LAPORAN.JS
 *************************************************/
-
+alert("laporan.js berhasil dimuat");
 let dataLaporan = [];
 
 async function loadLaporan(){
