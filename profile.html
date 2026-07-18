@@ -1,42 +1,190 @@
-<div class="card">
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Profil Guru - SIGAP RANI</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+
+    margin:0;
+    background:#f5f6fa;
+    font-family:Arial,Helvetica,sans-serif;
+
+}
+
+.header{
+
+    background:#1976d2;
+    color:white;
+    padding:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+.header h2{
+
+    margin:0;
+
+}
+
+.container{
+
+    max-width:900px;
+    margin:25px auto;
+    padding:15px;
+
+}
+
+.card{
+
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    margin-bottom:20px;
+
+}
+
+.table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+.table td{
+
+    padding:12px;
+    border-bottom:1px solid #eee;
+
+}
+
+.statistik{
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+
+}
+
+.box{
+
+    background:#1976d2;
+    color:white;
+    border-radius:10px;
+    text-align:center;
+    padding:20px;
+
+}
+
+.box h1{
+
+    margin:0;
+    font-size:34px;
+
+}
+
+.btn{
+
+    background:#1976d2;
+    color:white;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+
+}
+
+.btn:hover{
+
+    background:#0d47a1;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
 
 <h2>👤 Profil Guru</h2>
+
+<button class="btn" onclick="location='dashboard.html'">
+
+⬅ Dashboard
+
+</button>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Informasi Guru</h3>
 
 <table class="table">
 
 <tr>
+
 <td width="180"><b>Nama</b></td>
+
 <td id="pNama">-</td>
+
 </tr>
 
 <tr>
+
 <td><b>Email</b></td>
+
 <td id="pEmail">-</td>
+
 </tr>
 
 <tr>
+
 <td><b>Mata Pelajaran</b></td>
+
 <td id="pMapel">-</td>
+
 </tr>
 
 <tr>
+
 <td><b>Status</b></td>
+
 <td id="pStatus">
+
 <span style="color:green;font-weight:bold">
+
 Aktif
+
 </span>
+
 </td>
+
 </tr>
 
 </table>
 
 </div>
 
-<br>
-
 <div class="card">
 
-<h2>📊 Statistik Guru</h2>
+<h3>Statistik Guru</h3>
 
 <div class="statistik">
 
@@ -44,7 +192,7 @@ Aktif
 
 <h1 id="scanHariIni">0</h1>
 
-Scan Hari Ini
+<div>Scan Hari Ini</div>
 
 </div>
 
@@ -52,10 +200,60 @@ Scan Hari Ini
 
 <h1 id="totalScan">0</h1>
 
-Total Scan
+<div>Total Scan</div>
+
+</div>
+
+</div>
+<div class="card">
+
+<h3>Informasi Akun</h3>
+
+<table class="table">
+
+<tr>
+
+<td width="180"><b>Versi Aplikasi</b></td>
+
+<td>SIGAP RANI V4.1</td>
+
+</tr>
+
+<tr>
+
+<td><b>Login Terakhir</b></td>
+
+<td id="loginTerakhir">-</td>
+
+</tr>
+
+<tr>
+
+<td><b>Status Server</b></td>
+
+<td>
+
+<span style="color:green;font-weight:bold">
+
+🟢 Online
+
+</span>
+
+</td>
+
+</tr>
+
+</table>
 
 </div>
 
 </div>
 
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/profil.js"></script>
+
+</body>
+
+</html>
 </div>
