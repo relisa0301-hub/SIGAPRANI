@@ -166,3 +166,47 @@ function formatTanggal(tgl){
 }
 
 }
+/************************************************
+ STATISTIK LAPORAN
+************************************************/
+
+function hitungStatistik(){
+
+    const total = semuaData.length;
+
+    let hadir = 0;
+    let tidakHadir = 0;
+
+    semuaData.forEach(function(d){
+
+        if(String(d.status).toLowerCase()=="hadir"){
+
+            hadir++;
+
+        }else{
+
+            tidakHadir++;
+
+        }
+
+    });
+
+    if(document.getElementById("totalData")){
+
+        document.getElementById("totalData").innerHTML = total;
+
+    }
+
+    if(document.getElementById("totalHadir")){
+
+        document.getElementById("totalHadir").innerHTML = hadir;
+
+    }
+
+    if(document.getElementById("totalTidakHadir")){
+
+        document.getElementById("totalTidakHadir").innerHTML = tidakHadir;
+
+    }
+
+}
