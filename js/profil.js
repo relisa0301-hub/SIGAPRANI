@@ -3,21 +3,15 @@
  profil.js
 *************************************************/
 
-window.onload = function () {
-
-    loadProfil();
-
-};
-
-function loadProfil() {
+window.onload = async function(){
 
     const user = JSON.parse(
         localStorage.getItem(CONFIG.SESSION_KEY)
     );
 
-    if (!user) {
+    if(!user){
 
-        window.location = "index.html";
+        location="index.html";
         return;
 
     }
@@ -31,12 +25,12 @@ function loadProfil() {
     document.getElementById("pMapel").innerHTML =
         user.mapel || "-";
 
-    document.getElementById("pStatus").innerHTML =
-        "<span style='color:green;font-weight:bold'>Aktif</span>";
+    document.getElementById("loginTerakhir").innerHTML =
+        new Date().toLocaleString("id-ID");
 
-    hitungStatistikGuru(user.nama);
+    await hitungStatistikGuru(user.nama);
 
-}
+};
 
 async function hitungStatistikGuru(namaGuru){
 
@@ -54,11 +48,11 @@ async function hitungStatistikGuru(namaGuru){
 
         }
 
-        let hariIni = 0;
         let total = 0;
+        let hariIni = 0;
 
         const hari =
-            new Date().toLocaleDateString("en-CA");
+            new Date().toISOString().substring(0,10);
 
         hasil.data.forEach(function(d){
 
@@ -76,15 +70,15 @@ async function hitungStatistikGuru(namaGuru){
 
         });
 
-        document.getElementById("scanHariIni").innerHTML =
-            hariIni;
-
         document.getElementById("totalScan").innerHTML =
             total;
 
-    }catch(e){
+        document.getElementById("scanHariIni").innerHTML =
+            hariIni;
 
-        console.log(e);
+    }catch(err){
+
+        console.log(err);
 
     }
 
