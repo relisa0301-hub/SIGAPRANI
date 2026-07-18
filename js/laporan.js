@@ -175,38 +175,37 @@ function hitungStatistik(){
     const total = semuaData.length;
 
     let hadir = 0;
-    let tidakHadir = 0;
+    let tidak = 0;
 
     semuaData.forEach(function(d){
 
-        if(String(d.status).toLowerCase()=="hadir"){
+        if(String(d.status).trim()=="Hadir"){
 
             hadir++;
 
         }else{
 
-            tidakHadir++;
+            tidak++;
 
         }
 
     });
 
-    if(document.getElementById("totalData")){
+    document.getElementById("totalData").innerHTML = total;
 
-        document.getElementById("totalData").innerHTML = total;
+    document.getElementById("hadir").innerHTML = hadir;
 
-    }
+    document.getElementById("tidak").innerHTML = tidak;
 
-    if(document.getElementById("totalHadir")){
+    let persen = 0;
 
-        document.getElementById("totalHadir").innerHTML = hadir;
+    if(total>0){
 
-    }
-
-    if(document.getElementById("totalTidakHadir")){
-
-        document.getElementById("totalTidakHadir").innerHTML = tidakHadir;
+        persen = Math.round((hadir/total)*100);
 
     }
+
+    document.getElementById("persen").innerHTML =
+        persen + "%";
 
 }
