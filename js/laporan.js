@@ -12,19 +12,19 @@ async function loadLaporan(){
 
     try{
 
-       const hasil = await postAPI({
+        const hasil = await postAPI({
 
-    action:"laporan",
+            action:"laporan",
 
-    tanggal:document.getElementById("tgl").value,
+            tanggal:document.getElementById("tgl").value,
 
-    kelas:document.getElementById("kelas").value,
+            kelas:document.getElementById("kelas").value,
 
-    mapel:document.getElementById("mapel").value,
+            mapel:document.getElementById("mapel").value,
 
-    cari:document.getElementById("cari").value
+            cari:document.getElementById("cari").value
 
-});
+        });
 
         if(!hasil.status){
 
@@ -36,6 +36,11 @@ async function loadLaporan(){
                 </tr>
             `;
 
+            document.getElementById("totalData").innerHTML="0";
+            document.getElementById("hadir").innerHTML="0";
+            document.getElementById("tidak").innerHTML="0";
+            document.getElementById("persen").innerHTML="0%";
+
             return;
 
         }
@@ -45,59 +50,46 @@ async function loadLaporan(){
         let hadir=0;
         let tidak=0;
 
-        hasil.data.forEach((d,index)=>{
+        hasil.data.forEach(function(d,index){
 
-            if(d.status=="Hadir"){
+            if(d.status==="Hadir"){
                 hadir++;
             }else{
                 tidak++;
             }
 
-            tbody.innerHTML+=`
-
-            <tr>
-
-                <td>${index+1}</td>
-
-                <td>${d.tanggal}</td>
-
-                <td>${d.jam}</td>
-
-                <td>${d.nama}</td>
-
-                <td>${d.kelas}</td>
-
-                <td>${d.mapel}</td>
-
-                <td>${d.guru}</td>
-
-                <td>${d.status}</td>
-
-            </tr>
-
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index+1}</td>
+                    <td>${d.tanggal}</td>
+                    <td>${d.jam}</td>
+                    <td>${d.nama}</td>
+                    <td>${d.kelas}</td>
+                    <td>${d.mapel}</td>
+                    <td>${d.guru}</td>
+                    <td>${d.status}</td>
+                </tr>
             `;
 
         });
 
-        document.getElementById("totalData").innerHTML=hasil.data.length;
-        document.getElementById("hadir").innerHTML=hadir;
-        document.getElementById("tidak").innerHTML=tidak;
+        document.getElementById("totalData").innerHTML = hasil.data.length;
+        document.getElementById("hadir").innerHTML = hadir;
+        document.getElementById("tidak").innerHTML = tidak;
 
-        let persen=0;
+        let persen = 0;
 
         if(hasil.data.length>0){
-
-            persen=Math.round((hadir/hasil.data.length)*100);
-
+            persen = Math.round((hadir/hasil.data.length)*100);
         }
 
-        document.getElementById("persen").innerHTML=persen+"%";
+        document.getElementById("persen").innerHTML = persen + "%";
 
     }catch(err){
 
         console.log(err);
 
-        tbody.innerHTML=`
+        tbody.innerHTML = `
             <tr>
                 <td colspan="8" align="center">
                     Gagal mengambil data.
@@ -116,13 +108,18 @@ function exportPDF(){
 }
 
 function exportExcel(){
-document.getElementById("tgl").onchange=loadLaporan;
 
-document.getElementById("kelas").onchange=loadLaporan;
-
-document.getElementById("mapel").onchange=loadLaporan;
-
-document.getElementById("cari").onkeyup=loadLaporan;
-    alert("Export Excel akan kita aktifkan pada revisi berikutnya.");
+    alert("Fitur Export Excel akan kita aktifkan pada tahap berikutnya.");
 
 }
+
+window.onload = function(){
+
+    document.getElementById("tgl").onchange = loadLaporan;
+    document.getElementById("kelas").onchange = loadLaporan;
+    document.getElementById("mapel").onchange = loadLaporan;
+    document.getElementById("cari").onkeyup = loadLaporan;
+
+    loadLaporan();
+
+};
