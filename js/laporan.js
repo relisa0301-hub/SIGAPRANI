@@ -1,91 +1,168 @@
-/*************************************************
+/************************************************
  SIGAP RANI V4
- LAPORAN.GS
-*************************************************/
+ laporan.js
+ Tidak mempengaruhi Scanner QR
+************************************************/
 
-function getLaporan(req){
+let semuaData = [];
+let dataTampil = [];
 
-  const ss = SpreadsheetApp.openById("1VfH5Jdp6OdFHd_Igq5H_8lWeCliqvplpQYAvoCYRtro");
-  const sheet = ss.getSheetByName("DATA ABSENSI");
+window.onload = async function () {
 
-  const data = sheet.getDataRange().getValues();
+    await loadLaporan();
 
-  const hasil = [];
+};
 
-  const tglFilter = String(req.tanggal || "").trim();
-  const kelasFilter = String(req.kelas || "").trim();
-  const mapelFilter = String(req.mapel || "").trim();
-  const cari = String(req.cari || "").toLowerCase().trim();
+async function loadLaporan() {
 
-  for(let i=1;i<data.length;i++){
+    try {
 
-    const tanggal = Utilities.formatDate(
-      new Date(data[i][2]),
-      "Asia/Jakarta",
-      "yyyy-MM-dd"
-    );
+        const hasil = await postAPI({
 
-    const jam    = data[i][13];
-    const nis    = data[i][4];
-    const nama   = data[i][5];
+            action: "laporan"
 
-    // KODE KELAS
-    const kelas = String(data[i][6]);
+        });
 
-    const mapel = data[i][8];
-    const guru  = data[i][9];
-    const status= data[i][10];
+        if (!hasil.status) {
 
-    if(tglFilter && tanggal != tglFilter) continue;
+            alert("Data laporan gagal dimuat.");
 
-    // FILTER KELAS
-    if(kelasFilter && Number(kelas) != Number(kelasFilter)) continue;
+            return;
 
-    if(mapelFilter && mapel != mapelFilter) continue;
+        }
 
-    if(cari){
+        semuaData = hasil.data;
+        dataTampil = hasil.data;
 
-      const teks = (
-        nis+" "+
-        nama+" "+
-        kelas+" "+
-        mapel+" "+
-        guru
-      ).toLowerCase();
+        isiFilter();
+        hitungStatistik();
+        tampilTabel(dataTampil);
 
-      if(!teks.includes(cari)) continue;
+    } catch (e) {
+
+        console.log(e);
+
+        alert("Tidak dapat terhubung ke server.");
+
     }
+ function isiFilter() {
 
-    hasil.push({
+    const kelas = document.getElementById("filterKelas");
+    const mapel = document.getElementById("filterMapel");
 
-      tanggal:tanggal,
-      jam:jam,
-      nis:nis,
-      nama:nama,
-      kelas:kelas,
-      mapel:mapel,
-      guru:guru,
-      status:status
+    if (!kelas || !mapel) return;
+
+    kelas.innerHTML =
+        "<option value=''>Semua Kelas</option>";
+
+    mapel.innerHTML =
+        "<option value=''>Semua Mapel</option>";
+
+    let daftarKelas = [];
+    let daftarMapel = [];
+
+    semuaData.forEach(function (d) {
+
+        if (!daftarKelas.includes(d.kelas))
+            daftarKelas.push(d.kelas);
+
+        if (!daftarMapel.includes(d.mapel))
+            daftarMapel.push(d.mapel);
 
     });
 
-  }
+    daftarKelas.sort();
 
-  hasil.sort(function(a,b){
+    daftarMapel.sort();
 
-    if(a.tanggal>b.tanggal) return -1;
-    if(a.tanggal<b.tanggal) return 1;
+    daftarKelas.forEach(function (k) {
 
-    return 0;
+        kelas.innerHTML +=
+            "<option value='" + k + "'>" +
+            k +
+            "</option>";
 
-  });
+    });
 
-  return {
+    daftarMapel.forEach(function (m) {
 
-    status:true,
-    total:hasil.length,
-    data:hasil
+        mapel.innerHTML +=
+            "<option value='" + m + "'>" +
+            m +
+            "</option>";
 
-  };
+    });
+
+}
+ /************************************************
+ MENAMPILKAN TABEL LAPORAN
+************************************************/
+
+function tampilTabel(data){
+
+    const tbody = document.getElementById("tbodyLaporan");
+
+    if(!tbody){
+        return;
+    }
+
+    tbody.innerHTML = "";
+
+    if(data.length==0){
+
+        tbody.innerHTML =
+        "<tr><td colspan='10' style='text-align:center'>Tidak ada data</td></tr>";
+
+        return;
+
+    }
+
+    data.forEach(function(d,index){
+
+        let row = "<tr>";
+
+        row += "<td>"+(index+1)+"</td>";
+
+        row += "<td>"+formatTanggal(d.tanggal)+"</td>";
+
+        row += "<td>"+(d.jam||"-")+"</td>";
+
+        row += "<td>"+(d.nis||"-")+"</td>";
+
+        row += "<td>"+(d.nama||"-")+"</td>";
+
+        row += "<td>"+(d.kelas||"-")+"</td>";
+
+        row += "<td>"+(d.mapel||"-")+"</td>";
+
+        row += "<td>"+(d.guru||"-")+"</td>";
+
+        row += "<td>"+(d.status||"-")+"</td>";
+
+        row += "</tr>";
+
+        tbody.innerHTML += row;
+
+    });
+
+}
+
+function formatTanggal(tgl){
+
+    if(!tgl) return "-";
+
+    try{
+
+        const d = new Date(tgl);
+
+        return d.toLocaleDateString("id-ID");
+
+    }catch(e){
+
+        return tgl;
+
+    }
+
+}
 
 }
