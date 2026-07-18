@@ -51,28 +51,54 @@ async function loadLaporan() {
 
 function isiFilter() {
 
-    const kelas = document.getElementById("kelas");
-    const mapel = document.getElementById("mapel");
+    function isiFilter(){
 
-    if (!kelas || !mapel) return;
+    const kelas=document.getElementById("kelas");
+    const mapel=document.getElementById("mapel");
 
-    kelas.innerHTML =
-        "<option value=''>Semua Kelas</option>";
+    kelas.innerHTML="<option value=''>Semua Kelas</option>";
+    mapel.innerHTML="<option value=''>Semua Mapel</option>";
 
-    mapel.innerHTML =
-        "<option value=''>Semua Mapel</option>";
+    let daftarKelas=[];
+    let daftarMapel=[];
 
-    let listKelas = [];
-    let listMapel = [];
+    semuaData.forEach(function(item){
 
-    semuaData.forEach(function (d) {
+        const k=String(item.kelas||"").trim();
+        const m=String(item.mapel||"").trim();
 
-        if (d.kelas && !listKelas.includes(d.kelas)) {
+        if(k!="" && daftarKelas.indexOf(k)==-1){
 
-            listKelas.push(d.kelas);
+            daftarKelas.push(k);
 
         }
 
+        if(m!="" && daftarMapel.indexOf(m)==-1){
+
+            daftarMapel.push(m);
+
+        }
+
+    });
+
+    daftarKelas.sort();
+    daftarMapel.sort();
+
+    daftarKelas.forEach(function(k){
+
+        kelas.innerHTML +=
+        "<option value='"+k+"'>"+k+"</option>";
+
+    });
+
+    daftarMapel.forEach(function(m){
+
+        mapel.innerHTML +=
+        "<option value='"+m+"'>"+m+"</option>";
+
+    });
+
+}
         if (d.mapel && !listMapel.includes(d.mapel)) {
 
             listMapel.push(d.mapel);
