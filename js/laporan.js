@@ -19,7 +19,8 @@ async function loadLaporan() {
         const hasil = await postAPI({
             action: "laporan"
         });
-
+console.log(hasil);
+alert(JSON.stringify(hasil));
         if (!hasil.status) {
 
             alert("Data laporan gagal dimuat.");
