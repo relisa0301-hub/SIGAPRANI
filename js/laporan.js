@@ -91,16 +91,23 @@ function isiFilter() {
 
     daftarMapel.sort();
 
-    daftarKelas.forEach(function (k) {
+   daftarKelas.forEach(function(k){
 
-        kelas.innerHTML +=
-            "<option value='" +
-            k +
-            "'>" +
-            k +
-            "</option>";
+    k = String(k).trim();
 
-    });
+    if(
+        k=="" ||
+        k=="Kelas" ||
+        k=="Nama Kelas" ||
+        k.toLowerCase()=="kelas 91"
+    ){
+        return;
+    }
+
+    kelas.innerHTML +=
+        "<option value='"+k+"'>"+k+"</option>";
+
+});
 
     daftarMapel.forEach(function (m) {
 
