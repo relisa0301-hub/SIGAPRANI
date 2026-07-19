@@ -4,46 +4,264 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>DASHBOARD GURU</title>
+<title>SIGAP RANI | Dashboard Guru</title>
 
 <link rel="stylesheet" href="css/style.css">
 
 <script src="js/config.js"></script>
-
 <script src="js/dashboard.js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#f4f7fb;
+}
+
+.hero{
+
+position:relative;
+
+padding:40px;
+
+color:white;
+
+overflow:hidden;
+
+background:
+linear-gradient(
+rgba(0,0,0,.55),
+rgba(0,0,0,.55)
+),
+url("img/guru.jpg");
+
+background-size:cover;
+background-position:center;
+
+}
+
+.hero::before{
+
+content:"";
+
+position:absolute;
+
+right:30px;
+top:20px;
+
+width:170px;
+height:170px;
+
+background:url("img/logo.png");
+
+background-size:contain;
+background-repeat:no-repeat;
+
+opacity:.95;
+
+}
+
+.hero h1{
+
+margin:0;
+
+font-size:42px;
+
+font-weight:bold;
+
+}
+
+.hero h3{
+
+margin-top:10px;
+
+font-weight:normal;
+
+font-size:20px;
+
+}
+
+.hero p{
+
+font-size:18px;
+
+margin-top:20px;
+
+line-height:1.6;
+
+max-width:800px;
+
+}
+
+.infoGrid{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(240px,1fr));
+
+gap:20px;
+
+padding:30px;
+
+}
+
+.infoBox{
+
+background:white;
+
+border-radius:15px;
+
+padding:25px;
+
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+
+text-align:center;
+
+}
+
+.infoBox h2{
+
+margin:0;
+
+font-size:34px;
+
+color:#1565c0;
+
+}
+
+.infoBox span{
+
+display:block;
+
+margin-top:10px;
+
+font-size:17px;
+
+color:#666;
+
+}
+
+.menu{
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:20px;
+
+padding:30px;
+
+}
+
+.menu button{
+
+padding:35px;
+
+font-size:24px;
+
+border:none;
+
+border-radius:15px;
+
+cursor:pointer;
+
+background:#1565c0;
+
+color:white;
+
+transition:.3s;
+
+}
+
+.menu button:hover{
+
+transform:translateY(-5px);
+
+background:#0d47a1;
+
+}
+
+</style>
 
 </head>
 
 <body onload="cekLogin()">
 
-<div class="topbar">
+<div class="hero">
 
-<h2>SIGAP RANI</h2>
+<h1 id="sapaan">
+Selamat Datang
+</h1>
 
-<button onclick="logout()">Logout</button>
+<h3 id="namaGuru">
+Guru
+</h3>
+
+<p>
+
+<b>SIGAP RANI</b><br>
+
+Sistem Informasi Gadget Absensi Pelajar SPENSARANI.
+
+Aplikasi ini digunakan untuk melakukan absensi siswa menggunakan QR Code secara cepat, akurat, realtime, dan terintegrasi dengan Google Spreadsheet.
+
+</p>
 
 </div>
 
-<div class="container">
+<div class="infoGrid">
 
-<div class="card" style="padding:30px;margin-top:30px;">
+<div class="infoBox">
 
-<h2 id="namaGuru"></h2>
+<h2 id="tanggalHari">-</h2>
 
-<p>Email :
-<span id="emailGuru"></span>
-</p>
+<span>Hari & Tanggal</span>
 
-<p>Mata Pelajaran :
-<span id="mapelGuru"></span>
-</p>
+</div>
 
-<p>Level :
-<span id="levelGuru"></span>
-</p>
+<div class="infoBox">
+
+<h2 id="jamSekarang">00:00:00</h2>
+
+<span>Jam Real Time</span>
+
+</div>
+
+<div class="infoBox">
+
+<h2 id="mapelGuru">-</h2>
+
+<span>Mata Pelajaran</span>
+
+</div>
+
+<div class="infoBox">
+
+<h2 id="kelasGuru">-</h2>
+
+<span>Kelas Diampu</span>
+
+</div>
+
+<div class="infoBox">
+
+<h2 id="scanHariIni">0</h2>
+
+<span>Scan Hari Ini</span>
+
+</div>
+
+<div class="infoBox">
+
+<h2 id="totalScan">0</h2>
+
+<span>Total Scan</span>
+
+</div>
 
 </div>
 
@@ -51,9 +269,7 @@
 
 <button onclick="bukaScan()">
 
-📷
-
-<br>
+📷<br><br>
 
 SCAN QR
 
@@ -61,9 +277,7 @@ SCAN QR
 
 <button onclick="bukaLaporan()">
 
-📊
-
-<br>
+📊<br><br>
 
 LAPORAN
 
@@ -71,15 +285,11 @@ LAPORAN
 
 <button onclick="bukaProfil()">
 
-👤
-
-<br>
+👤<br><br>
 
 PROFIL
 
 </button>
-
-</div>
 
 </div>
 
