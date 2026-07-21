@@ -1,1 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Dashboard Admin</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<script src="js/config.js"></script>
+
+<script src="js/api.js"></script>
+
+<script src="js/admin.js"></script>
+
+</head>
+
+<body onload="loadDashboard()">
+
+<div class="topbar">
+
+<h2>SIGAP RANI ADMIN</h2>
+
+<button onclick="logout()">
+
+Logout
+
+</button>
+
+</div>
+
+<div class="container">
+
+<div class="menu">
+
+<div class="card">
+
+<h3>Jumlah Siswa</h3>
+
+<h1 id="jumlahSiswa">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>Jumlah Guru</h3>
+
+<h1 id="jumlahGuru">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>Hadir Hari Ini</h3>
+
+<h1 id="hadirHariIni">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>Total Absensi</h3>
+
+<h1 id="totalAbsensi">0</h1>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
