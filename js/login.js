@@ -24,14 +24,25 @@ async function login() {
     if(hasil.status){
 
         localStorage.setItem(
-
             CONFIG.SESSION_KEY,
-
             JSON.stringify(hasil.data)
-
         );
 
-        window.location="dashboard.html";
+        const level = String(hasil.data.level).toLowerCase().trim();
+
+        if(level=="superadmin"){
+
+            window.location="superadmin.html";
+
+        }else if(level=="admin"){
+
+            window.location="admin.html";
+
+        }else{
+
+            window.location="dashboard.html";
+
+        }
 
     }else{
 
