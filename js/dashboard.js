@@ -156,7 +156,7 @@ function bukaLaporan(){
 
 function bukaProfil(){
 
-    location="profil.html";
+    location.href="profile.html";
 
 }
 
