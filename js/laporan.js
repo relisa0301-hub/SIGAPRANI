@@ -32,9 +32,10 @@ alert(JSON.stringify(hasil));
         semuaData = hasil.data;
         dataTampil = [...semuaData];
 
-        isiFilter();
-        hitungStatistik();
-        tampilTabel(dataTampil);
+       isiFilter();
+await loadMapelFilter();
+hitungStatistik();
+tampilTabel(dataTampil);
 
     } catch (err) {
 
@@ -310,3 +311,25 @@ window.addEventListener("load", function () {
         cari.onkeyup = filterData;
 
 });
+async function loadMapelFilter(){
+
+    const hasil = await postAPI({
+        action:"mapel"
+    });
+
+    if(!hasil.status){
+        return;
+    }
+
+    const mapel = document.getElementById("mapel");
+
+    mapel.innerHTML = "<option value=''>Semua Mapel</option>";
+
+    hasil.data.forEach(function(m){
+
+        mapel.innerHTML +=
+        "<option value='"+m+"'>"+m+"</option>";
+
+    });
+
+}
