@@ -30,7 +30,7 @@ async function login() {
 
         const level = String(hasil.data.level).toLowerCase().trim();
 
-        if(level=="superadmin"){
+       if(level=="super admin" || level=="superadmin"){
 
             window.location="superadmin.html";
 
