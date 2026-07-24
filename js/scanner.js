@@ -14,11 +14,39 @@ async function mulaiScanner() {
         return;
     }
 
-    document.getElementById("mapel").innerHTML =
-        "<option value='" + user.mapel + "'>" +
-        user.mapel +
-        "</option>";
+  const mapelSelect = document.getElementById("mapel");
 
+mapelSelect.innerHTML = "";
+
+if(user.mapelList && user.mapelList.length > 0){
+
+    user.mapelList.forEach(function(m){
+
+        mapelSelect.innerHTML +=
+        "<option value='"+m+"'>"+m+"</option>";
+
+    });
+
+}else{
+
+    mapelSelect.innerHTML =
+    "<option value='"+user.mapel+"'>"+
+    user.mapel+
+    "</option>";
+
+}
+
+document.getElementById("infoMapel").innerHTML =
+    mapelSelect.value;
+
+mapelSelect.onchange = async function(){
+
+    document.getElementById("infoMapel").innerHTML =
+        this.value;
+
+    await tampilBelumHadir();
+
+};
     const dataKelas = await getAPI("kelas");
 
     if (!dataKelas.status) {
@@ -192,7 +220,8 @@ async function scanBerhasil(qr) {
 
         guru: user.nama,
 
-        mapel: user.mapel
+     mapel:
+document.getElementById("mapel").value
 
     });
     if (hasil.status) {
