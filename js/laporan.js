@@ -316,7 +316,247 @@ async function loadMapelFilter(){
     const hasil = await postAPI({
         action:"mapel"
     });
+/*************************************************
+ SIGAP RANI V4
+ EXPORT LAPORAN
+ TIDAK MENGUBAH SCANNER / ABSENSI
+*************************************************/
 
+function exportExcel(){
+
+    if(!dataTampil || dataTampil.length === 0){
+
+        alert("Tidak ada data laporan untuk diekspor.");
+
+        return;
+
+    }
+
+    let csv = "\uFEFF";
+
+    csv +=
+        "No,Tanggal,Jam,Nama,Kelas,Mapel,Guru,Status\n";
+
+    dataTampil.forEach(function(d,index){
+
+        csv +=
+            '"' + (index + 1) + '",' +
+            '"' + (formatTanggal(d.tanggal) || '') + '",' +
+            '"' + (d.jam || '') + '",' +
+            '"' + (d.nama || '') + '",' +
+            '"' + (d.kelas || '') + '",' +
+            '"' + (d.mapel || '') + '",' +
+            '"' + (d.guru || '') + '",' +
+            '"' + (d.status || '') + '"\n';
+
+    });
+
+    const blob = new Blob(
+        [csv],
+        {
+            type:"text/csv;charset=utf-8;"
+        }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+        "Laporan_Absensi_SIGAP_RANI.csv";
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/*************************************************
+ EXPORT PDF
+*************************************************/
+
+function exportPDF(){
+
+    if(!dataTampil || dataTampil.length === 0){
+
+        alert("Tidak ada data laporan untuk diekspor.");
+
+        return;
+
+    }
+
+    let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+
+    <meta charset="UTF-8">
+
+    <title>Laporan Absensi SIGAP RANI</title>
+
+    <style>
+
+        body{
+            font-family:Arial,sans-serif;
+            padding:20px;
+        }
+
+        h1{
+            text-align:center;
+            font-size:22px;
+            margin-bottom:5px;
+        }
+
+        h2{
+            text-align:center;
+            font-size:16px;
+            margin-top:0;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:20px;
+        }
+
+        th{
+            background:#1769c2;
+            color:white;
+            padding:8px;
+            border:1px solid #333;
+        }
+
+        td{
+            padding:7px;
+            border:1px solid #333;
+            font-size:12px;
+        }
+
+        .footer{
+            margin-top:20px;
+            font-size:12px;
+        }
+
+        @media print{
+
+            @page{
+                size:A4 landscape;
+                margin:10mm;
+            }
+
+        }
+
+    </style>
+
+    </head>
+
+    <body>
+
+    <h1>LAPORAN ABSENSI</h1>
+
+    <h2>SIGAP RANI</h2>
+
+    <table>
+
+    <thead>
+
+    <tr>
+        <th>No</th>
+        <th>Tanggal</th>
+        <th>Jam</th>
+        <th>Nama</th>
+        <th>Kelas</th>
+        <th>Mapel</th>
+        <th>Guru</th>
+        <th>Status</th>
+    </tr>
+
+    </thead>
+
+    <tbody>
+    `;
+
+    dataTampil.forEach(function(d,index){
+
+        html += `
+        <tr>
+
+            <td>${index + 1}</td>
+
+            <td>${formatTanggal(d.tanggal) || "-"}</td>
+
+            <td>${d.jam || "-"}</td>
+
+            <td>${d.nama || "-"}</td>
+
+            <td>${d.kelas || "-"}</td>
+
+            <td>${d.mapel || "-"}</td>
+
+            <td>${d.guru || "-"}</td>
+
+            <td>${d.status || "-"}</td>
+
+        </tr>
+        `;
+
+    });
+
+    html += `
+
+    </tbody>
+
+    </table>
+
+    <div class="footer">
+        Total data: ${dataTampil.length}
+    </div>
+
+    <script>
+
+        window.onload = function(){
+
+            window.print();
+
+        };
+
+    <\/script>
+
+    </body>
+
+    </html>
+    `;
+
+    const jendela = window.open(
+        "",
+        "_blank",
+        "width=1200,height=800"
+    );
+
+    if(!jendela){
+
+        alert(
+            "Popup diblokir browser. Izinkan popup untuk SIGAP RANI."
+        );
+
+        return;
+
+    }
+
+    jendela.document.open();
+
+    jendela.document.write(html);
+
+    jendela.document.close();
+
+}
     if(!hasil.status){
         return;
     }
