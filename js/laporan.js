@@ -573,3 +573,300 @@ function exportPDF(){
     });
 
 }
+/*************************************************
+ EXPORT PDF
+ Tidak mengubah data atau scanner
+ Mengikuti data yang sedang difilter
+*************************************************/
+
+function exportPDF(){
+
+    if(!dataTampil || dataTampil.length === 0){
+
+        alert("Tidak ada data yang dapat diexport.");
+
+        return;
+
+    }
+
+    let isi = "";
+
+    dataTampil.forEach(function(d,index){
+
+        isi += `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${formatTanggal(d.tanggal)}</td>
+            <td>${d.jam || "-"}</td>
+            <td>${d.nama || "-"}</td>
+            <td>${d.kelas || "-"}</td>
+            <td>${d.mapel || "-"}</td>
+            <td>${d.guru || "-"}</td>
+            <td>${d.status || "-"}</td>
+        </tr>
+        `;
+
+    });
+
+    const halaman = window.open("", "_blank");
+
+    if(!halaman){
+
+        alert("Popup diblokir browser. Izinkan popup untuk SIGAP RANI.");
+
+        return;
+
+    }
+
+    halaman.document.write(`
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Laporan Absensi SIGAP RANI</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    margin:30px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:5px;
+}
+
+h2{
+    text-align:center;
+    font-size:16px;
+    margin-top:0;
+    margin-bottom:25px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+}
+
+th{
+    background:#1769c2;
+    color:white;
+    padding:8px;
+    border:1px solid #999;
+}
+
+td{
+    padding:7px;
+    border:1px solid #999;
+}
+
+.info{
+    margin-bottom:15px;
+    font-size:12px;
+}
+
+@media print{
+
+    body{
+        margin:10mm;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>LAPORAN ABSENSI</h1>
+
+<h2>SIGAP RANI - SMP NEGERI 1 RAMBANG NIRU</h2>
+
+<div class="info">
+Jumlah Data: ${dataTampil.length}
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>No</th>
+<th>Tanggal</th>
+<th>Jam</th>
+<th>Nama</th>
+<th>Kelas</th>
+<th>Mapel</th>
+<th>Guru</th>
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+${isi}
+
+</tbody>
+
+</table>
+
+<script>
+
+window.onload = function(){
+
+    window.print();
+
+};
+
+<\/script>
+
+</body>
+
+</html>
+`);
+
+    halaman.document.close();
+
+}
+
+
+/*************************************************
+ EXPORT EXCEL
+ Tidak mengubah data atau scanner
+ Mengikuti data yang sedang difilter
+*************************************************/
+
+function exportExcel(){
+
+    if(!dataTampil || dataTampil.length === 0){
+
+        alert("Tidak ada data yang dapat diexport.");
+
+        return;
+
+    }
+
+    let html = `
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+table{
+    border-collapse:collapse;
+}
+
+th{
+    background:#1769c2;
+    color:white;
+    font-weight:bold;
+}
+
+th,td{
+    border:1px solid #000;
+    padding:6px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>LAPORAN ABSENSI SIGAP RANI</h2>
+
+<table>
+
+<tr>
+
+<th>No</th>
+<th>Tanggal</th>
+<th>Jam</th>
+<th>Nama</th>
+<th>Kelas</th>
+<th>Mapel</th>
+<th>Guru</th>
+<th>Status</th>
+
+</tr>
+`;
+
+    dataTampil.forEach(function(d,index){
+
+        html += `
+<tr>
+
+<td>${index + 1}</td>
+
+<td>${formatTanggal(d.tanggal)}</td>
+
+<td>${d.jam || "-"}</td>
+
+<td>${d.nama || "-"}</td>
+
+<td>${d.kelas || "-"}</td>
+
+<td>${d.mapel || "-"}</td>
+
+<td>${d.guru || "-"}</td>
+
+<td>${d.status || "-"}</td>
+
+</tr>
+`;
+
+    });
+
+    html += `
+</table>
+
+</body>
+
+</html>
+`;
+
+    const blob = new Blob(
+        [html],
+        {
+            type:"application/vnd.ms-excel"
+        }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    const tanggal =
+        document.getElementById("tgl") ?
+        document.getElementById("tgl").value :
+        "";
+
+    a.download =
+        "Laporan_Absensi_SIGAP_RANI_" +
+        tanggal +
+        ".xls";
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+}
