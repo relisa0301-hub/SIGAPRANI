@@ -330,9 +330,14 @@ function exportTidakHadirExcel() {
  EXPORT PDF LAPORAN BIASA
 *************************************************/
 
+```javascript
 function exportPDF() {
     const tabel = document.getElementById("tblLaporan");
-    if (!tabel) return;
+
+    if (!tabel) {
+        alert("Tabel laporan tidak ditemukan.");
+        return;
+    }
 
     const jendela = window.open("", "_blank");
 
@@ -341,31 +346,36 @@ function exportPDF() {
         return;
     }
 
-    jendela.document.write(`
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-        <meta charset="UTF-8">
-        <title>Laporan Absensi SIGAP RANI</title>
-        <style>
-        body{font-family:Arial,sans-serif;padding:20px}
-        h2{text-align:center}
-        table{width:100%;border-collapse:collapse}
-        th,td{border:1px solid #555;padding:7px;text-align:left}
-        th{background:#eee}
-        </style>
-        </head>
-        <body>
-        <h2>LAPORAN ABSENSI SIGAP RANI</h2>
-        ${tabel.outerHTML}
-        </body>
-        </html>
-    `);
+    const htmlLaporan = [
+        "<!DOCTYPE html>",
+        '<html lang="id">',
+        "<head>",
+        '<meta charset="UTF-8">',
+        "<title>Laporan Absensi SIGAP RANI</title>",
+        "<style>",
+        "body{font-family:Arial,sans-serif;padding:20px}",
+        "h2{text-align:center}",
+        "table{width:100%;border-collapse:collapse}",
+        "th,td{border:1px solid #555;padding:7px;text-align:left}",
+        "th{background:#eee}",
+        "</style>",
+        "</head>",
+        "<body>",
+        "<h2>LAPORAN ABSENSI SIGAP RANI</h2>",
+        tabel.outerHTML,
+        "</body>",
+        "</html>"
+    ].join("");
 
+    jendela.document.open();
+    jendela.document.write(htmlLaporan);
     jendela.document.close();
+
     jendela.focus();
     jendela.print();
 }
+```
+
 
 /*************************************************
  EXPORT EXCEL LAPORAN BIASA
