@@ -1,872 +1,423 @@
+```javascript
 /*************************************************
  SIGAP RANI V4
- laporan.js
- Dibuat ulang agar stabil
- Tidak mempengaruhi Scanner QR
+ LAPORAN.JS
+ Laporan absensi dan daftar siswa tidak hadir
 *************************************************/
 
 let semuaData = [];
 let dataTampil = [];
+let dataTidakHadir = [];
 
-window.onload = async function () {
-    await loadLaporan();
-};
+/*************************************************
+ MEMUAT LAPORAN ABSENSI
+*************************************************/
 
 async function loadLaporan() {
-
     try {
-
         const hasil = await postAPI({
             action: "laporan"
         });
-console.log(hasil);
-alert(JSON.stringify(hasil));
-        if (!hasil.status) {
 
+        if (!hasil || !hasil.status) {
             alert("Data laporan gagal dimuat.");
-
             return;
-
         }
 
-        semuaData = hasil.data;
+        semuaData = hasil.data || [];
         dataTampil = [...semuaData];
 
-       isiFilter();
-await loadMapelFilter();
-hitungStatistik();
-tampilTabel(dataTampil);
+        isiFilter();
+        await loadMapelFilter();
+        hitungStatistik();
+        tampilTabel(dataTampil);
 
     } catch (err) {
-
-        console.log(err);
-
+        console.error(err);
         alert("Tidak dapat mengambil data laporan.");
-
     }
-
 }
+
 /*************************************************
-MENGISI FILTER KELAS & MAPEL
+ FILTER KELAS
 *************************************************/
 
 function isiFilter() {
-
     const kelas = document.getElementById("kelas");
-    const mapel = document.getElementById("mapel");
+    if (!kelas) return;
 
-    if (!kelas || !mapel) return;
+    const nilaiLama = kelas.value;
 
-    kelas.innerHTML =
-        "<option value=''>Semua Kelas</option>";
+    kelas.innerHTML = "<option value=''>Semua Kelas</option>";
 
-    mapel.innerHTML =
-        "<option value=''>Semua Mapel</option>";
+    const daftar = [...new Set(
+        semuaData
+            .map(d => String(d.kelas || "").trim())
+            .filter(k => k && k.toLowerCase() !== "kelas 91")
+    )].sort();
 
-    let daftarKelas = [];
-    let daftarMapel = [];
-
-    semuaData.forEach(function (d) {
-
-        if (
-            d.kelas &&
-            !daftarKelas.includes(d.kelas)
-        ) {
-
-            daftarKelas.push(d.kelas);
-
-        }
-
-        if (
-            d.mapel &&
-            !daftarMapel.includes(d.mapel)
-        ) {
-
-            daftarMapel.push(d.mapel);
-
-        }
-
+    daftar.forEach(k => {
+        kelas.innerHTML +=
+            "<option value='" + amanHTML(k) + "'>" +
+            amanHTML(k) + "</option>";
     });
 
-    daftarKelas.sort();
+    kelas.value = nilaiLama;
+}
 
-    daftarMapel.sort();
+/*************************************************
+ FILTER MAPEL
+*************************************************/
 
-   daftarKelas.forEach(function(k){
+async function loadMapelFilter() {
+    const mapel = document.getElementById("mapel");
+    if (!mapel) return;
 
-    k = String(k).trim();
+    const nilaiLama = mapel.value;
 
-    if(
-        k=="" ||
-        k=="Kelas" ||
-        k=="Nama Kelas" ||
-        k.toLowerCase()=="kelas 91"
-    ){
-        return;
+    try {
+        const hasil = await postAPI({ action: "mapel" });
+
+        if (hasil && hasil.status && Array.isArray(hasil.data)) {
+            mapel.innerHTML = "<option value=''>Semua Mapel</option>";
+
+            hasil.data.forEach(m => {
+                mapel.innerHTML +=
+                    "<option value='" + amanHTML(m) + "'>" +
+                    amanHTML(m) + "</option>";
+            });
+        }
+    } catch (err) {
+        console.error("Gagal memuat mapel:", err);
     }
 
-    kelas.innerHTML +=
-        "<option value='"+k+"'>"+k+"</option>";
-
-});
-
-    daftarMapel.forEach(function (m) {
-
-        mapel.innerHTML +=
-            "<option value='" +
-            m +
-            "'>" +
-            m +
-            "</option>";
-
-    });
-
+    mapel.value = nilaiLama;
 }
+
 /*************************************************
-MENAMPILKAN TABEL LAPORAN
+ MENAMPILKAN TABEL LAPORAN
 *************************************************/
 
 function tampilTabel(data) {
-
-    const tbody =
-        document.getElementById("tbodyLaporan");
-
+    const tbody = document.getElementById("tbodyLaporan");
     if (!tbody) return;
 
     tbody.innerHTML = "";
 
-    if (data.length == 0) {
-
+    if (!data || data.length === 0) {
         tbody.innerHTML =
-            "<tr><td colspan='9' style='text-align:center;padding:20px;'>Tidak ada data.</td></tr>";
-
+            "<tr><td colspan='9' style='text-align:center;padding:20px'>" +
+            "Tidak ada data.</td></tr>";
         return;
-
     }
 
-    data.forEach(function (d, index) {
+    data.forEach((d, index) => {
+        const row = document.createElement("tr");
 
-        let row = "<tr>";
+        [
+            index + 1,
+            formatTanggal(d.tanggal),
+            d.jam || "-",
+            d.nis || "-",
+            d.nama || "-",
+            d.kelas || "-",
+            d.mapel || "-",
+            d.guru || "-",
+            d.status || "-"
+        ].forEach(nilai => {
+            const td = document.createElement("td");
+            td.textContent = nilai;
+            row.appendChild(td);
+        });
 
-        row += "<td>" + (index + 1) + "</td>";
-
-        row += "<td>" + formatTanggal(d.tanggal) + "</td>";
-
-        row += "<td>" + (d.jam || "-") + "</td>";
-
-        row += "<td>" + (d.nama || "-") + "</td>";
-
-        row += "<td>" + (d.kelas || "-") + "</td>";
-
-        row += "<td>" + (d.mapel || "-") + "</td>";
-
-        row += "<td>" + (d.guru || "-") + "</td>";
-
-        row += "<td>" + (d.status || "-") + "</td>";
-
-        row += "</tr>";
-
-        tbody.innerHTML += row;
-
+        tbody.appendChild(row);
     });
-
 }
 
-function formatTanggal(tgl) {
-
-    if (!tgl) return "-";
-
-    try {
-
-        return new Date(tgl).toLocaleDateString(
-            "id-ID"
-        );
-
-    } catch (e) {
-
-        return tgl;
-
-    }
-
-}
 /*************************************************
-STATISTIK LAPORAN
+ FORMAT TANGGAL
 *************************************************/
 
-function hitungStatistik() {
+function formatTanggal(tgl) {
+    if (!tgl) return "-";
 
-    const total = semuaData.length;
+    const bagian = String(tgl).match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
-    let hadir = 0;
-    let tidak = 0;
-
-    semuaData.forEach(function (d) {
-
-        if (String(d.status).trim() == "Hadir") {
-
-            hadir++;
-
-        } else {
-
-            tidak++;
-
-        }
-
-    });
-
-    document.getElementById("totalData").innerHTML = total;
-    document.getElementById("hadir").innerHTML = hadir;
-    document.getElementById("tidak").innerHTML = tidak;
-
-    let persen = 0;
-
-    if (total > 0) {
-
-        persen = Math.round((hadir / total) * 100);
-
+    if (bagian) {
+        return bagian[3] + "/" + bagian[2] + "/" + bagian[1];
     }
 
-    document.getElementById("persen").innerHTML =
-        persen + "%";
-
+    return tgl;
 }
 
 /*************************************************
-FILTER DATA
+ STATISTIK
+*************************************************/
+
+function hitungStatistik(data = semuaData) {
+    const total = data.length;
+    const hadir = data.filter(
+        d => String(d.status || "").trim().toLowerCase() === "hadir"
+    ).length;
+    const tidak = total - hadir;
+    const persen = total ? Math.round(hadir / total * 100) : 0;
+
+    document.getElementById("totalData").textContent = total;
+    document.getElementById("hadir").textContent = hadir;
+    document.getElementById("tidak").textContent = tidak;
+    document.getElementById("persen").textContent = persen + "%";
+}
+
+/*************************************************
+ FILTER LAPORAN BIASA
 *************************************************/
 
 function filterData() {
+    const tgl = document.getElementById("tgl").value;
+    const kelas = document.getElementById("kelas").value;
+    const mapel = document.getElementById("mapel").value;
+    const cari = document.getElementById("cari").value.toLowerCase().trim();
 
-    const tgl =
-        document.getElementById("tgl").value;
-
-    const kelas =
-        document.getElementById("kelas").value;
-
-    const mapel =
-        document.getElementById("mapel").value;
-
-    const cari =
-        document.getElementById("cari")
-        .value
-        .toLowerCase();
-
-    dataTampil = semuaData.filter(function (d) {
-
-        let cocok = true;
-
-        if (tgl && String(d.tanggal).indexOf(tgl) < 0)
-            cocok = false;
-
-        if (kelas && d.kelas != kelas)
-            cocok = false;
-
-        if (mapel && d.mapel != mapel)
-            cocok = false;
-
-        if (
-            cari &&
-            String(d.nama)
-                .toLowerCase()
-                .indexOf(cari) < 0
-        )
-            cocok = false;
-
-        return cocok;
-
+    dataTampil = semuaData.filter(d => {
+        if (tgl && String(d.tanggal).substring(0, 10) !== tgl) return false;
+        if (kelas && String(d.kelas).trim() !== kelas) return false;
+        if (mapel && String(d.mapel).trim() !== mapel) return false;
+        if (cari && !String(d.nama || "").toLowerCase().includes(cari)) return false;
+        return true;
     });
 
+    hitungStatistik(dataTampil);
     tampilTabel(dataTampil);
-
 }
 
 /*************************************************
-EVENT FILTER
+ TAMPILKAN SISWA TIDAK HADIR
+ Memakai API laporanTidakHadir
+*************************************************/
+
+async function tampilkanTidakHadir() {
+    const tanggal = document.getElementById("tgl").value;
+    const kelas = document.getElementById("kelas").value;
+    const mapel = document.getElementById("mapel").value;
+    const jam = document.getElementById("jamTidakHadir").value;
+
+    if (!tanggal || !kelas || !mapel || !jam) {
+        alert("Pilih tanggal, kelas, mapel, dan jam pelajaran terlebih dahulu.");
+        return;
+    }
+
+    try {
+        const hasil = await postAPI({
+            action: "laporanTidakHadir",
+            tanggal: tanggal,
+            kelas: kelas,
+            mapel: mapel,
+            jam: jam
+        });
+
+        if (!hasil || !hasil.status) {
+            alert((hasil && hasil.message) || "Data tidak hadir gagal diambil.");
+            return;
+        }
+
+        dataTidakHadir = hasil.data || [];
+
+        const tbody = document.getElementById("tbodyLaporan");
+        tbody.innerHTML = "";
+
+        if (dataTidakHadir.length === 0) {
+            tbody.innerHTML =
+                "<tr><td colspan='9' style='text-align:center;padding:20px'>" +
+                "Semua siswa sudah tercatat hadir pada pilihan ini.</td></tr>";
+        } else {
+            dataTidakHadir.forEach((d, index) => {
+                const row = document.createElement("tr");
+
+                [
+                    index + 1,
+                    formatTanggal(d.tanggal),
+                    d.jam || "-",
+                    d.nis || "-",
+                    d.nama || "-",
+                    d.kelas || "-",
+                    d.mapel || "-",
+                    "-",
+                    "Tidak Hadir"
+                ].forEach(nilai => {
+                    const td = document.createElement("td");
+                    td.textContent = nilai;
+                    row.appendChild(td);
+                });
+
+                tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById("totalData").textContent = dataTidakHadir.length;
+        document.getElementById("hadir").textContent = "0";
+        document.getElementById("tidak").textContent = dataTidakHadir.length;
+        document.getElementById("persen").textContent = "0%";
+
+        document.querySelector(".card:last-child h3").textContent =
+            "Daftar Siswa Tidak Hadir";
+
+    } catch (err) {
+        console.error(err);
+        alert("Gagal mengambil daftar tidak hadir. Periksa koneksi dan API.");
+    }
+}
+
+/*************************************************
+ DOWNLOAD EXCEL DAFTAR TIDAK HADIR
+*************************************************/
+
+function exportTidakHadirExcel() {
+    if (!dataTidakHadir.length) {
+        alert("Tampilkan daftar Tidak Hadir terlebih dahulu.");
+        return;
+    }
+
+    const tanggal = document.getElementById("tgl").value;
+    const kelas = document.getElementById("kelas").value;
+    const mapel = document.getElementById("mapel").value;
+    const jam = document.getElementById("jamTidakHadir").value;
+
+    const baris = [
+        ["LAPORAN SISWA TIDAK HADIR"],
+        ["Tanggal", tanggal],
+        ["Kelas", kelas],
+        ["Mata Pelajaran", mapel],
+        ["Jam Pelajaran", jam],
+        [],
+        ["No", "NIS", "Nama Siswa", "Kelas", "Mapel", "Jam", "Status"]
+    ];
+
+    dataTidakHadir.forEach((d, i) => {
+        baris.push([
+            i + 1,
+            d.nis,
+            d.nama,
+            d.kelas,
+            d.mapel,
+            d.jam,
+            "Tidak Hadir"
+        ]);
+    });
+
+    const csv = "\uFEFF" + baris.map(row =>
+        row.map(nilai =>
+            '"' + String(nilai == null ? "" : nilai).replace(/"/g, '""') + '"'
+        ).join(";")
+    ).join("\r\n");
+
+    const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "Tidak_Hadir_" + tanggal + "_Kelas_" + kelas + ".csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+/*************************************************
+ EXPORT PDF LAPORAN BIASA
+*************************************************/
+
+function exportPDF() {
+    const tabel = document.getElementById("tblLaporan");
+    if (!tabel) return;
+
+    const jendela = window.open("", "_blank");
+
+    if (!jendela) {
+        alert("Izinkan pop-up browser untuk mencetak PDF.");
+        return;
+    }
+
+    jendela.document.write(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+        <meta charset="UTF-8">
+        <title>Laporan Absensi SIGAP RANI</title>
+        <style>
+        body{font-family:Arial,sans-serif;padding:20px}
+        h2{text-align:center}
+        table{width:100%;border-collapse:collapse}
+        th,td{border:1px solid #555;padding:7px;text-align:left}
+        th{background:#eee}
+        </style>
+        </head>
+        <body>
+        <h2>LAPORAN ABSENSI SIGAP RANI</h2>
+        ${tabel.outerHTML}
+        </body>
+        </html>
+    `);
+
+    jendela.document.close();
+    jendela.focus();
+    jendela.print();
+}
+
+/*************************************************
+ EXPORT EXCEL LAPORAN BIASA
+*************************************************/
+
+function exportExcel() {
+    const tabel = document.getElementById("tblLaporan");
+    if (!tabel) return;
+
+    const blob = new Blob(
+        ["\uFEFF", tabel.outerHTML],
+        { type: "application/vnd.ms-excel;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "Laporan_Absensi_SIGAP_RANI.xls";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+/*************************************************
+ KEAMANAN TEKS FILTER
+*************************************************/
+
+function amanHTML(nilai) {
+    return String(nilai == null ? "" : nilai)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+/*************************************************
+ EVENT FILTER
 *************************************************/
 
 window.addEventListener("load", function () {
-
-    const tgl =
-        document.getElementById("tgl");
-
-    const kelas =
-        document.getElementById("kelas");
-
-    const mapel =
-        document.getElementById("mapel");
-
-    const cari =
-        document.getElementById("cari");
-
-    if (tgl)
-        tgl.onchange = filterData;
-
-    if (kelas)
-        kelas.onchange = filterData;
-
-    if (mapel)
-        mapel.onchange = filterData;
-
-    if (cari)
-        cari.onkeyup = filterData;
-
-});
-async function loadMapelFilter(){
-
-    const hasil = await postAPI({
-        action:"mapel"
-    });
-/*************************************************
- SIGAP RANI V4
- EXPORT LAPORAN
- TIDAK MENGUBAH SCANNER / ABSENSI
-*************************************************/
-
-function exportExcel(){
-
-    if(!dataTampil || dataTampil.length === 0){
-
-        alert("Tidak ada data laporan untuk diekspor.");
-
-        return;
-
-    }
-
-    let csv = "\uFEFF";
-
-    csv +=
-        "No,Tanggal,Jam,Nama,Kelas,Mapel,Guru,Status\n";
-
-    dataTampil.forEach(function(d,index){
-
-        csv +=
-            '"' + (index + 1) + '",' +
-            '"' + (formatTanggal(d.tanggal) || '') + '",' +
-            '"' + (d.jam || '') + '",' +
-            '"' + (d.nama || '') + '",' +
-            '"' + (d.kelas || '') + '",' +
-            '"' + (d.mapel || '') + '",' +
-            '"' + (d.guru || '') + '",' +
-            '"' + (d.status || '') + '"\n';
-
-    });
-
-    const blob = new Blob(
-        [csv],
-        {
-            type:"text/csv;charset=utf-8;"
-        }
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-
-    a.href = url;
-
-    a.download =
-        "Laporan_Absensi_SIGAP_RANI.csv";
-
-    document.body.appendChild(a);
-
-    a.click();
-
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-
-}
-
-
-/*************************************************
- EXPORT PDF
-*************************************************/
-
-function exportPDF(){
-
-    if(!dataTampil || dataTampil.length === 0){
-
-        alert("Tidak ada data laporan untuk diekspor.");
-
-        return;
-
-    }
-
-    let html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-
-    <meta charset="UTF-8">
-
-    <title>Laporan Absensi SIGAP RANI</title>
-
-    <style>
-
-        body{
-            font-family:Arial,sans-serif;
-            padding:20px;
-        }
-
-        h1{
-            text-align:center;
-            font-size:22px;
-            margin-bottom:5px;
-        }
-
-        h2{
-            text-align:center;
-            font-size:16px;
-            margin-top:0;
-        }
-
-        table{
-            width:100%;
-            border-collapse:collapse;
-            margin-top:20px;
-        }
-
-        th{
-            background:#1769c2;
-            color:white;
-            padding:8px;
-            border:1px solid #333;
-        }
-
-        td{
-            padding:7px;
-            border:1px solid #333;
-            font-size:12px;
-        }
-
-        .footer{
-            margin-top:20px;
-            font-size:12px;
-        }
-
-        @media print{
-
-            @page{
-                size:A4 landscape;
-                margin:10mm;
-            }
-
-        }
-
-    </style>
-
-    </head>
-
-    <body>
-
-    <h1>LAPORAN ABSENSI</h1>
-
-    <h2>SIGAP RANI</h2>
-
-    <table>
-
-    <thead>
-
-    <tr>
-        <th>No</th>
-        <th>Tanggal</th>
-        <th>Jam</th>
-        <th>Nama</th>
-        <th>Kelas</th>
-        <th>Mapel</th>
-        <th>Guru</th>
-        <th>Status</th>
-    </tr>
-
-    </thead>
-
-    <tbody>
-    `;
-
-    dataTampil.forEach(function(d,index){
-
-        html += `
-        <tr>
-
-            <td>${index + 1}</td>
-
-            <td>${formatTanggal(d.tanggal) || "-"}</td>
-
-            <td>${d.jam || "-"}</td>
-
-            <td>${d.nama || "-"}</td>
-
-            <td>${d.kelas || "-"}</td>
-
-            <td>${d.mapel || "-"}</td>
-
-            <td>${d.guru || "-"}</td>
-
-            <td>${d.status || "-"}</td>
-
-        </tr>
-        `;
-
-    });
-
-    html += `
-
-    </tbody>
-
-    </table>
-
-    <div class="footer">
-        Total data: ${dataTampil.length}
-    </div>
-
-    <script>
-
-        window.onload = function(){
-
-            window.print();
-
-        };
-
-    <\/script>
-
-    </body>
-
-    </html>
-    `;
-
-    const jendela = window.open(
-        "",
-        "_blank",
-        "width=1200,height=800"
-    );
-
-    if(!jendela){
-
-        alert(
-            "Popup diblokir browser. Izinkan popup untuk SIGAP RANI."
+    ["tgl", "kelas", "mapel", "cari"].forEach(id => {
+        const elemen = document.getElementById(id);
+        if (!elemen) return;
+
+        elemen.addEventListener(
+            id === "cari" ? "input" : "change",
+            filterData
         );
-
-        return;
-
-    }
-
-    jendela.document.open();
-
-    jendela.document.write(html);
-
-    jendela.document.close();
-
-}
-    if(!hasil.status){
-        return;
-    }
-
-    const mapel = document.getElementById("mapel");
-
-    mapel.innerHTML = "<option value=''>Semua Mapel</option>";
-
-    hasil.data.forEach(function(m){
-
-        mapel.innerHTML +=
-        "<option value='"+m+"'>"+m+"</option>";
-
     });
-
-}
-/*************************************************
- EXPORT PDF
- Tidak mengubah data atau scanner
- Mengikuti data yang sedang difilter
-*************************************************/
-
-function exportPDF(){
-
-    if(!dataTampil || dataTampil.length === 0){
-
-        alert("Tidak ada data yang dapat diexport.");
-
-        return;
-
-    }
-
-    let isi = "";
-
-    dataTampil.forEach(function(d,index){
-
-        isi += `
-        <tr>
-            <td>${index + 1}</td>
-            <td>${formatTanggal(d.tanggal)}</td>
-            <td>${d.jam || "-"}</td>
-            <td>${d.nama || "-"}</td>
-            <td>${d.kelas || "-"}</td>
-            <td>${d.mapel || "-"}</td>
-            <td>${d.guru || "-"}</td>
-            <td>${d.status || "-"}</td>
-        </tr>
-        `;
-
-    });
-
-    const halaman = window.open("", "_blank");
-
-    if(!halaman){
-
-        alert("Popup diblokir browser. Izinkan popup untuk SIGAP RANI.");
-
-        return;
-
-    }
-
-    halaman.document.write(`
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>Laporan Absensi SIGAP RANI</title>
-
-<style>
-
-body{
-    font-family:Arial,sans-serif;
-    margin:30px;
-}
-
-h1{
-    text-align:center;
-    margin-bottom:5px;
-}
-
-h2{
-    text-align:center;
-    font-size:16px;
-    margin-top:0;
-    margin-bottom:25px;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:12px;
-}
-
-th{
-    background:#1769c2;
-    color:white;
-    padding:8px;
-    border:1px solid #999;
-}
-
-td{
-    padding:7px;
-    border:1px solid #999;
-}
-
-.info{
-    margin-bottom:15px;
-    font-size:12px;
-}
-
-@media print{
-
-    body{
-        margin:10mm;
-    }
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<h1>LAPORAN ABSENSI</h1>
-
-<h2>SIGAP RANI - SMP NEGERI 1 RAMBANG NIRU</h2>
-
-<div class="info">
-Jumlah Data: ${dataTampil.length}
-</div>
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>No</th>
-<th>Tanggal</th>
-<th>Jam</th>
-<th>Nama</th>
-<th>Kelas</th>
-<th>Mapel</th>
-<th>Guru</th>
-<th>Status</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-${isi}
-
-</tbody>
-
-</table>
-
-<script>
-
-window.onload = function(){
-
-    window.print();
-
-};
-
-<\/script>
-
-</body>
-
-</html>
-`);
-
-    halaman.document.close();
-
-}
-
-
-/*************************************************
- EXPORT EXCEL
- Tidak mengubah data atau scanner
- Mengikuti data yang sedang difilter
-*************************************************/
-
-function exportExcel(){
-
-    if(!dataTampil || dataTampil.length === 0){
-
-        alert("Tidak ada data yang dapat diexport.");
-
-        return;
-
-    }
-
-    let html = `
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<style>
-
-table{
-    border-collapse:collapse;
-}
-
-th{
-    background:#1769c2;
-    color:white;
-    font-weight:bold;
-}
-
-th,td{
-    border:1px solid #000;
-    padding:6px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<h2>LAPORAN ABSENSI SIGAP RANI</h2>
-
-<table>
-
-<tr>
-
-<th>No</th>
-<th>Tanggal</th>
-<th>Jam</th>
-<th>Nama</th>
-<th>Kelas</th>
-<th>Mapel</th>
-<th>Guru</th>
-<th>Status</th>
-
-</tr>
-`;
-
-    dataTampil.forEach(function(d,index){
-
-        html += `
-<tr>
-
-<td>${index + 1}</td>
-
-<td>${formatTanggal(d.tanggal)}</td>
-
-<td>${d.jam || "-"}</td>
-
-<td>${d.nama || "-"}</td>
-
-<td>${d.kelas || "-"}</td>
-
-<td>${d.mapel || "-"}</td>
-
-<td>${d.guru || "-"}</td>
-
-<td>${d.status || "-"}</td>
-
-</tr>
-`;
-
-    });
-
-    html += `
-</table>
-
-</body>
-
-</html>
-`;
-
-    const blob = new Blob(
-        [html],
-        {
-            type:"application/vnd.ms-excel"
-        }
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-
-    a.href = url;
-
-    const tanggal =
-        document.getElementById("tgl") ?
-        document.getElementById("tgl").value :
-        "";
-
-    a.download =
-        "Laporan_Absensi_SIGAP_RANI_" +
-        tanggal +
-        ".xls";
-
-    document.body.appendChild(a);
-
-    a.click();
-
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-
-}
+});
+```
