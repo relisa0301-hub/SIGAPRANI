@@ -1,7 +1,7 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -9,10 +9,7 @@
 
 <link rel="stylesheet" href="css/style.css">
 
-
-
 <style>
-
 body{
     background:#f4f7fb;
     font-family:Poppins,Arial,sans-serif;
@@ -79,6 +76,14 @@ body{
     background:#0D47A1;
 }
 
+.btn-absen{
+    background:#C62828;
+}
+
+.btn-absen:hover{
+    background:#8E0000;
+}
+
 .statistik{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -124,164 +129,139 @@ tr:hover{
     flex-wrap:wrap;
     margin-top:15px;
 }
-
 </style>
-
 </head>
 
 <body onload="loadLaporan()">
 
 <div class="topbar">
-
-<h2>📊 LAPORAN ABSENSI</h2>
-
-<button onclick="location='dashboard.html'">
-
-Dashboard
-
-</button>
-
+    <h2>📊 LAPORAN ABSENSI</h2>
+    <button onclick="location='dashboard.html'">Dashboard</button>
 </div>
 
 <div class="container">
 
-<div class="card">
+    <div class="card">
+        <h3>Filter Laporan</h3>
 
-<h3>Filter Laporan</h3>
+        <div class="filter">
+            <input type="date" id="tgl">
 
-<div class="filter">
+            <select id="kelas">
+                <option value="">Semua Kelas</option>
+            </select>
 
-<input type="date" id="tgl">
+            <select id="mapel">
+                <option value="">Semua Mapel</option>
+            </select>
 
-<select id="kelas">
+            <select id="jamTidakHadir">
+                <option value="">Pilih Jam Pelajaran</option>
+                <option value="1">Jam 1</option>
+                <option value="2">Jam 2</option>
+                <option value="3">Jam 3</option>
+                <option value="4">Jam 4</option>
+                <option value="5">Jam 5</option>
+                <option value="6">Jam 6</option>
+                <option value="7">Jam 7</option>
+                <option value="8">Jam 8</option>
+                <option value="9">Jam 9</option>
+                <option value="10">Jam 10</option>
+            </select>
 
-<option value="">Semua Kelas</option>
+            <input
+                type="text"
+                id="cari"
+                placeholder="Cari Nama Siswa">
+        </div>
 
-</select>
+        <div class="action">
 
-<select id="mapel">
+            <button class="btn" onclick="loadLaporan()">
+                🔄 Tampilkan
+            </button>
 
-<option value="">Semua Mapel</option>
+            <button class="btn" onclick="exportPDF()">
+                🖨 Export PDF
+            </button>
 
-</select>
+            <button class="btn" onclick="exportExcel()">
+                📗 Export Excel
+            </button>
 
-<input
-type="text"
-id="cari"
-placeholder="Cari Nama Siswa">
+            <button
+                class="btn btn-absen"
+                onclick="tampilkanTidakHadir()">
+                🔴 Tampilkan Tidak Hadir
+            </button>
 
-</div>
+            <button
+                class="btn btn-absen"
+                onclick="exportTidakHadirExcel()">
+                📥 Download Tidak Hadir
+            </button>
 
-<div class="action">
+        </div>
+    </div>
 
-<button class="btn" onclick="loadLaporan()">
+    <div class="statistik">
 
-🔄 Tampilkan
+        <div class="box">
+            <h1 id="totalData">0</h1>
+            Total Data
+        </div>
 
-</button>
+        <div class="box">
+            <h1 id="hadir">0</h1>
+            Hadir
+        </div>
 
-<button class="btn" onclick="exportPDF()">
+        <div class="box">
+            <h1 id="tidak">0</h1>
+            Tidak Hadir
+        </div>
 
-🖨 Export PDF
+        <div class="box">
+            <h1 id="persen">0%</h1>
+            Persentase
+        </div>
 
-</button>
+    </div>
 
-<button class="btn" onclick="exportExcel()">
+    <div class="card">
+        <h3>Data Absensi</h3>
 
-📗 Export Excel
+        <table id="tblLaporan">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>Jam</th>
+                    <th>NIS</th>
+                    <th>Nama</th>
+                    <th>Kelas</th>
+                    <th>Mapel</th>
+                    <th>Guru</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
 
-</button>
-
-</div>
-
-</div>
-
-<div class="statistik">
-
-<div class="box">
-
-<h1 id="totalData">0</h1>
-
-Total Data
-
-</div>
-
-<div class="box">
-
-<h1 id="hadir">0</h1>
-
-Hadir
-
-</div>
-
-<div class="box">
-
-<h1 id="tidak">0</h1>
-
-Tidak Hadir
-
-</div>
-
-<div class="box">
-
-<h1 id="persen">0%</h1>
-
-Persentase
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>Data Absensi</h3>
-
-<table id="tblLaporan">
-
-<thead>
-
-<tr>
-
-<th>No</th>
-
-<th>Tanggal</th>
-
-<th>Jam</th>
-
-<th>Nama</th>
-
-<th>Kelas</th>
-
-<th>Mapel</th>
-
-<th>Guru</th>
-
-<th>Status</th>
-
-</tr>
-
-</thead>
-
-<tbody id="tbodyLaporan">
-
-<tr>
-
-<td colspan="8" align="center">
-
-Memuat Data...
-
-</td>
-
-</tr>
-
-</tbody>
-</table>
+            <tbody id="tbodyLaporan">
+                <tr>
+                    <td colspan="9" align="center">
+                        Memuat Data...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 </div>
 
-</div>
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script src="js/laporan.js"></script>
+
 </body>
 </html>
+```
