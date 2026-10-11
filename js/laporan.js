@@ -1,23 +1,17 @@
-
+```javascript
 /*************************************************
  SIGAP RANI V4
  LAPORAN.JS
- Laporan absensi dan daftar siswa tidak hadir
 *************************************************/
 
 let semuaData = [];
 let dataTampil = [];
 let dataTidakHadir = [];
 
-/*************************************************
- MEMUAT LAPORAN ABSENSI
-*************************************************/
-
+/* MEMUAT LAPORAN */
 async function loadLaporan() {
     try {
-        const hasil = await postAPI({
-            action: "laporan"
-        });
+        const hasil = await postAPI({ action: "laporan" });
 
         if (!hasil || !hasil.status) {
             alert("Data laporan gagal dimuat.");
@@ -27,77 +21,69 @@ async function loadLaporan() {
         semuaData = hasil.data || [];
         dataTampil = [...semuaData];
 
-        isiFilter();
+        await isiFilter();
         await loadMapelFilter();
-        hitungStatistik();
+        hitungStatistik(dataTampil);
         tampilTabel(dataTampil);
 
     } catch (err) {
-        console.error(err);
-        alert("Tidak dapat mengambil data laporan.");
+        console.error("Gagal memuat laporan:", err);
+        alert("Data laporan gagal dimuat. Periksa Console browser.");
     }
 }
 
-/*************************************************
- FILTER KELAS
-*************************************************/
+/* FILTER KELAS */
+async function isiFilter() {
+    const elemen = document.getElementById("kelas");
+    if (!elemen) return;
 
-function isiFilter() {
-    const kelas = document.getElementById("kelas");
-    if (!kelas) return;
+    const nilaiLama = elemen.value;
+    elemen.innerHTML = "<option value=''>Semua Kelas</option>";
 
-    const nilaiLama = kelas.value;
+    let daftar = [...new Set(
+        semuaData.map(d => String(d.kelas || "").trim()).filter(Boolean)
+    )];
 
-    kelas.innerHTML = "<option value=''>Semua Kelas</option>";
-
-    const daftar = [...new Set(
-        semuaData
-            .map(d => String(d.kelas || "").trim())
-            .filter(k => k && k.toLowerCase() !== "kelas 91")
-    )].sort();
+    daftar.sort();
 
     daftar.forEach(k => {
-        kelas.innerHTML +=
-            "<option value='" + amanHTML(k) + "'>" +
-            amanHTML(k) + "</option>";
+        const opsi = document.createElement("option");
+        opsi.value = k;
+        opsi.textContent = k;
+        elemen.appendChild(opsi);
     });
 
-    kelas.value = nilaiLama;
+    elemen.value = nilaiLama;
 }
 
-/*************************************************
- FILTER MAPEL
-*************************************************/
-
+/* FILTER MAPEL */
 async function loadMapelFilter() {
-    const mapel = document.getElementById("mapel");
-    if (!mapel) return;
+    const elemen = document.getElementById("mapel");
+    if (!elemen) return;
 
-    const nilaiLama = mapel.value;
+    const nilaiLama = elemen.value;
 
     try {
         const hasil = await postAPI({ action: "mapel" });
 
         if (hasil && hasil.status && Array.isArray(hasil.data)) {
-            mapel.innerHTML = "<option value=''>Semua Mapel</option>";
+            elemen.innerHTML = "<option value=''>Semua Mapel</option>";
 
             hasil.data.forEach(m => {
-                mapel.innerHTML +=
-                    "<option value='" + amanHTML(m) + "'>" +
-                    amanHTML(m) + "</option>";
+                const opsi = document.createElement("option");
+                opsi.value = m;
+                opsi.textContent = m;
+                elemen.appendChild(opsi);
             });
         }
     } catch (err) {
         console.error("Gagal memuat mapel:", err);
     }
 
-    mapel.value = nilaiLama;
+    elemen.value = nilaiLama;
 }
 
-/*************************************************
- MENAMPILKAN TABEL LAPORAN
-*************************************************/
-
+/* TABEL LAPORAN */
 function tampilTabel(data) {
     const tbody = document.getElementById("tbodyLaporan");
     if (!tbody) return;
@@ -106,16 +92,15 @@ function tampilTabel(data) {
 
     if (!data || data.length === 0) {
         tbody.innerHTML =
-            "<tr><td colspan='9' style='text-align:center;padding:20px'>" +
-            "Tidak ada data.</td></tr>";
+            "<tr><td colspan='9' style='text-align:center;padding:20px'>Tidak ada data.</td></tr>";
         return;
     }
 
-    data.forEach((d, index) => {
-        const row = document.createElement("tr");
+    data.forEach((d, i) => {
+        const tr = document.createElement("tr");
 
         [
-            index + 1,
+            i + 1,
             formatTanggal(d.tanggal),
             d.jam || "-",
             d.nis || "-",
@@ -127,51 +112,38 @@ function tampilTabel(data) {
         ].forEach(nilai => {
             const td = document.createElement("td");
             td.textContent = nilai;
-            row.appendChild(td);
+            tr.appendChild(td);
         });
 
-        tbody.appendChild(row);
+        tbody.appendChild(tr);
     });
 }
 
-/*************************************************
- FORMAT TANGGAL
-*************************************************/
-
+/* FORMAT TANGGAL */
 function formatTanggal(tgl) {
     if (!tgl) return "-";
 
-    const bagian = String(tgl).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-
-    if (bagian) {
-        return bagian[3] + "/" + bagian[2] + "/" + bagian[1];
-    }
+    const cocok = String(tgl).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (cocok) return cocok[3] + "/" + cocok[2] + "/" + cocok[1];
 
     return tgl;
 }
 
-/*************************************************
- STATISTIK
-*************************************************/
-
+/* STATISTIK */
 function hitungStatistik(data = semuaData) {
     const total = data.length;
     const hadir = data.filter(
         d => String(d.status || "").trim().toLowerCase() === "hadir"
     ).length;
-    const tidak = total - hadir;
-    const persen = total ? Math.round(hadir / total * 100) : 0;
 
     document.getElementById("totalData").textContent = total;
     document.getElementById("hadir").textContent = hadir;
-    document.getElementById("tidak").textContent = tidak;
-    document.getElementById("persen").textContent = persen + "%";
+    document.getElementById("tidak").textContent = total - hadir;
+    document.getElementById("persen").textContent =
+        (total ? Math.round(hadir / total * 100) : 0) + "%";
 }
 
-/*************************************************
- FILTER LAPORAN BIASA
-*************************************************/
-
+/* FILTER LAPORAN */
 function filterData() {
     const tgl = document.getElementById("tgl").value;
     const kelas = document.getElementById("kelas").value;
@@ -190,11 +162,7 @@ function filterData() {
     tampilTabel(dataTampil);
 }
 
-/*************************************************
- TAMPILKAN SISWA TIDAK HADIR
- Memakai API laporanTidakHadir
-*************************************************/
-
+/* TAMPILKAN SISWA TIDAK HADIR */
 async function tampilkanTidakHadir() {
     const tanggal = document.getElementById("tgl").value;
     const kelas = document.getElementById("kelas").value;
@@ -216,7 +184,7 @@ async function tampilkanTidakHadir() {
         });
 
         if (!hasil || !hasil.status) {
-            alert((hasil && hasil.message) || "Data tidak hadir gagal diambil.");
+            alert((hasil && hasil.message) || "Gagal mengambil data tidak hadir.");
             return;
         }
 
@@ -227,14 +195,13 @@ async function tampilkanTidakHadir() {
 
         if (dataTidakHadir.length === 0) {
             tbody.innerHTML =
-                "<tr><td colspan='9' style='text-align:center;padding:20px'>" +
-                "Semua siswa sudah tercatat hadir pada pilihan ini.</td></tr>";
+                "<tr><td colspan='9' style='text-align:center;padding:20px'>Semua siswa sudah tercatat hadir pada pilihan ini.</td></tr>";
         } else {
-            dataTidakHadir.forEach((d, index) => {
-                const row = document.createElement("tr");
+            dataTidakHadir.forEach((d, i) => {
+                const tr = document.createElement("tr");
 
                 [
-                    index + 1,
+                    i + 1,
                     formatTanggal(d.tanggal),
                     d.jam || "-",
                     d.nis || "-",
@@ -246,31 +213,25 @@ async function tampilkanTidakHadir() {
                 ].forEach(nilai => {
                     const td = document.createElement("td");
                     td.textContent = nilai;
-                    row.appendChild(td);
+                    tr.appendChild(td);
                 });
 
-                tbody.appendChild(row);
+                tbody.appendChild(tr);
             });
         }
 
         document.getElementById("totalData").textContent = dataTidakHadir.length;
-        document.getElementById("hadir").textContent = "0";
+        document.getElementById("hadir").textContent = 0;
         document.getElementById("tidak").textContent = dataTidakHadir.length;
         document.getElementById("persen").textContent = "0%";
 
-        document.querySelector(".card:last-child h3").textContent =
-            "Daftar Siswa Tidak Hadir";
-
     } catch (err) {
-        console.error(err);
+        console.error("Gagal memuat siswa tidak hadir:", err);
         alert("Gagal mengambil daftar tidak hadir. Periksa koneksi dan API.");
     }
 }
 
-/*************************************************
- DOWNLOAD EXCEL DAFTAR TIDAK HADIR
-*************************************************/
-
+/* DOWNLOAD SISWA TIDAK HADIR */
 function exportTidakHadirExcel() {
     if (!dataTidakHadir.length) {
         alert("Tampilkan daftar Tidak Hadir terlebih dahulu.");
@@ -286,7 +247,7 @@ function exportTidakHadirExcel() {
         ["LAPORAN SISWA TIDAK HADIR"],
         ["Tanggal", tanggal],
         ["Kelas", kelas],
-        ["Mata Pelajaran", mapel],
+        ["Mapel", mapel],
         ["Jam Pelajaran", jam],
         [],
         ["No", "NIS", "Nama Siswa", "Kelas", "Mapel", "Jam", "Status"]
@@ -294,26 +255,15 @@ function exportTidakHadirExcel() {
 
     dataTidakHadir.forEach((d, i) => {
         baris.push([
-            i + 1,
-            d.nis,
-            d.nama,
-            d.kelas,
-            d.mapel,
-            d.jam,
-            "Tidak Hadir"
+            i + 1, d.nis, d.nama, d.kelas, d.mapel, d.jam, "Tidak Hadir"
         ]);
     });
 
     const csv = "\uFEFF" + baris.map(row =>
-        row.map(nilai =>
-            '"' + String(nilai == null ? "" : nilai).replace(/"/g, '""') + '"'
-        ).join(";")
+        row.map(v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(";")
     ).join("\r\n");
 
-    const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8;"
-    });
-
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
@@ -322,15 +272,10 @@ function exportTidakHadirExcel() {
     document.body.appendChild(link);
     link.click();
     link.remove();
-
     URL.revokeObjectURL(url);
 }
 
-/*************************************************
- EXPORT PDF LAPORAN BIASA
-*************************************************/
-
-```javascript
+/* EXPORT PDF */
 function exportPDF() {
     const tabel = document.getElementById("tblLaporan");
 
@@ -370,17 +315,11 @@ function exportPDF() {
     jendela.document.open();
     jendela.document.write(htmlLaporan);
     jendela.document.close();
-
     jendela.focus();
     jendela.print();
 }
-```
 
-
-/*************************************************
- EXPORT EXCEL LAPORAN BIASA
-*************************************************/
-
+/* EXPORT EXCEL LAPORAN */
 function exportExcel() {
     const tabel = document.getElementById("tblLaporan");
     if (!tabel) return;
@@ -398,27 +337,10 @@ function exportExcel() {
     document.body.appendChild(link);
     link.click();
     link.remove();
-
     URL.revokeObjectURL(url);
 }
 
-/*************************************************
- KEAMANAN TEKS FILTER
-*************************************************/
-
-function amanHTML(nilai) {
-    return String(nilai == null ? "" : nilai)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
-/*************************************************
- EVENT FILTER
-*************************************************/
-
+/* EVENT FILTER */
 window.addEventListener("load", function () {
     ["tgl", "kelas", "mapel", "cari"].forEach(id => {
         const elemen = document.getElementById(id);
