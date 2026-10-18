@@ -176,7 +176,7 @@ async function tampilkanTidakHadir() {
 
     try {
         const hasil = await postAPI({
-            action: "laporanTidakHadir",
+           action: "belumHadir",
             tanggal: tanggal,
             kelas: kelas,
             mapel: mapel,
