@@ -189,7 +189,13 @@ async function tampilkanTidakHadir() {
         }
 
         dataTidakHadir = hasil.data || [];
-
+alert(
+    "Tanggal: " + tanggal +
+    "\nKelas: " + kelas +
+    "\nMapel: " + mapel +
+    "\nJam: " + jam +
+    "\nJumlah tidak hadir: " + dataTidakHadir.length
+);
         const tbody = document.getElementById("tbodyLaporan");
         tbody.innerHTML = "";
 
