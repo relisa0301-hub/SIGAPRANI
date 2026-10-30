@@ -1,4 +1,3 @@
-
 /*************************************************
  SIGAP RANI V4
  LAPORAN.JS
@@ -38,6 +37,7 @@ async function isiFilter() {
     if (!elemen) return;
 
     const nilaiLama = elemen.value;
+
     elemen.innerHTML = "<option value=''>Semua Kelas</option>";
 
     let daftar = [...new Set(
@@ -124,7 +124,9 @@ function formatTanggal(tgl) {
     if (!tgl) return "-";
 
     const cocok = String(tgl).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (cocok) return cocok[3] + "/" + cocok[2] + "/" + cocok[1];
+    if (cocok) {
+        return cocok[3] + "/" + cocok[2] + "/" + cocok[1];
+    }
 
     return tgl;
 }
@@ -132,6 +134,7 @@ function formatTanggal(tgl) {
 /* STATISTIK */
 function hitungStatistik(data = semuaData) {
     const total = data.length;
+
     const hadir = data.filter(
         d => String(d.status || "").trim().toLowerCase() === "hadir"
     ).length;
@@ -139,6 +142,7 @@ function hitungStatistik(data = semuaData) {
     document.getElementById("totalData").textContent = total;
     document.getElementById("hadir").textContent = hadir;
     document.getElementById("tidak").textContent = total - hadir;
+
     document.getElementById("persen").textContent =
         (total ? Math.round(hadir / total * 100) : 0) + "%";
 }
@@ -155,6 +159,7 @@ function filterData() {
         if (kelas && String(d.kelas).trim() !== kelas) return false;
         if (mapel && String(d.mapel).trim() !== mapel) return false;
         if (cari && !String(d.nama || "").toLowerCase().includes(cari)) return false;
+
         return true;
     });
 
@@ -176,7 +181,7 @@ async function tampilkanTidakHadir() {
 
     try {
         const hasil = await postAPI({
-           action: "belumHadir",
+            action: "laporanTidakHadir",
             tanggal: tanggal,
             kelas: kelas,
             mapel: mapel,
@@ -184,24 +189,23 @@ async function tampilkanTidakHadir() {
         });
 
         if (!hasil || !hasil.status) {
-            alert((hasil && hasil.message) || "Gagal mengambil data tidak hadir.");
+            alert(
+                (hasil && hasil.message) ||
+                "Gagal mengambil data tidak hadir."
+            );
             return;
         }
 
         dataTidakHadir = hasil.data || [];
-alert(
-    "Tanggal: " + tanggal +
-    "\nKelas: " + kelas +
-    "\nMapel: " + mapel +
-    "\nJam: " + jam +
-    "\nJumlah tidak hadir: " + dataTidakHadir.length
-);
+
         const tbody = document.getElementById("tbodyLaporan");
         tbody.innerHTML = "";
 
         if (dataTidakHadir.length === 0) {
             tbody.innerHTML =
-                "<tr><td colspan='9' style='text-align:center;padding:20px'>Semua siswa sudah tercatat hadir pada pilihan ini.</td></tr>";
+                "<tr><td colspan='9' style='text-align:center;padding:20px'>" +
+                "Semua siswa sudah tercatat hadir pada pilihan ini." +
+                "</td></tr>";
         } else {
             dataTidakHadir.forEach((d, i) => {
                 const tr = document.createElement("tr");
@@ -226,9 +230,14 @@ alert(
             });
         }
 
-        document.getElementById("totalData").textContent = dataTidakHadir.length;
+        document.getElementById("totalData").textContent =
+            dataTidakHadir.length;
+
         document.getElementById("hadir").textContent = 0;
-        document.getElementById("tidak").textContent = dataTidakHadir.length;
+
+        document.getElementById("tidak").textContent =
+            dataTidakHadir.length;
+
         document.getElementById("persen").textContent = "0%";
 
     } catch (err) {
@@ -261,23 +270,38 @@ function exportTidakHadirExcel() {
 
     dataTidakHadir.forEach((d, i) => {
         baris.push([
-            i + 1, d.nis, d.nama, d.kelas, d.mapel, d.jam, "Tidak Hadir"
+            i + 1,
+            d.nis,
+            d.nama,
+            d.kelas,
+            d.mapel,
+            d.jam,
+            "Tidak Hadir"
         ]);
     });
 
     const csv = "\uFEFF" + baris.map(row =>
-        row.map(v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(";")
+        row.map(v =>
+            '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'
+        ).join(";")
     ).join("\r\n");
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(
+        [csv],
+        { type: "text/csv;charset=utf-8;" }
+    );
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "Tidak_Hadir_" + tanggal + "_Kelas_" + kelas + ".csv";
+    link.download =
+        "Tidak_Hadir_" + tanggal + "_Kelas_" + kelas + ".csv";
+
     document.body.appendChild(link);
     link.click();
     link.remove();
+
     URL.revokeObjectURL(url);
 }
 
@@ -340,9 +364,11 @@ function exportExcel() {
 
     link.href = url;
     link.download = "Laporan_Absensi_SIGAP_RANI.xls";
+
     document.body.appendChild(link);
     link.click();
     link.remove();
+
     URL.revokeObjectURL(url);
 }
 
@@ -358,4 +384,3 @@ window.addEventListener("load", function () {
         );
     });
 });
-
