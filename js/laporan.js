@@ -168,6 +168,8 @@ function filterData() {
 }
 
 /* TAMPILKAN SISWA TIDAK HADIR */
+
+/* TAMPILKAN SISWA TIDAK HADIR */
 async function tampilkanTidakHadir() {
     const tanggal = document.getElementById("tgl").value;
     const kelas = document.getElementById("kelas").value;
@@ -189,10 +191,7 @@ async function tampilkanTidakHadir() {
         });
 
         if (!hasil || !hasil.status) {
-            alert(
-                (hasil && hasil.message) ||
-                "Gagal mengambil data tidak hadir."
-            );
+            alert((hasil && hasil.message) || "Gagal mengambil data tidak hadir.");
             return;
         }
 
@@ -203,9 +202,7 @@ async function tampilkanTidakHadir() {
 
         if (dataTidakHadir.length === 0) {
             tbody.innerHTML =
-                "<tr><td colspan='9' style='text-align:center;padding:20px'>" +
-                "Semua siswa sudah tercatat hadir pada pilihan ini." +
-                "</td></tr>";
+                "<tr><td colspan='9' style='text-align:center;padding:20px'>Semua siswa sudah tercatat hadir pada pilihan ini.</td></tr>";
         } else {
             dataTidakHadir.forEach((d, i) => {
                 const tr = document.createElement("tr");
@@ -230,14 +227,9 @@ async function tampilkanTidakHadir() {
             });
         }
 
-        document.getElementById("totalData").textContent =
-            dataTidakHadir.length;
-
+        document.getElementById("totalData").textContent = dataTidakHadir.length;
         document.getElementById("hadir").textContent = 0;
-
-        document.getElementById("tidak").textContent =
-            dataTidakHadir.length;
-
+        document.getElementById("tidak").textContent = dataTidakHadir.length;
         document.getElementById("persen").textContent = "0%";
 
     } catch (err) {
